@@ -381,5 +381,5 @@ web-nang-cao-blogg-ai/
 ## 📄 Bản quyền & Tác giả
 
 - Dự án: **Phenikaa News & Entertainment**
-- Đơn vị phát triển: **Nhóm Phát Triển Công Nghệ Web Nâng Cao**
-- Giấy phép: **ISC License**
+- Đơn vị phát triển: **Nguyễn Đăng Khoa 24100476**
+-Bài tập lớn cho môn web nâng cao
