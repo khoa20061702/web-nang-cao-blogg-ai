@@ -1,0 +1,6 @@
+{
+  "name": "VietNews AI - Blog & News Platform with Gemini Summarizer",
+  "description": "Production-ready Node.js Express backend and full-stack news platform featuring Gemini AI post summarization API (POST /api/ai/summarize) in Vietnamese and English.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
