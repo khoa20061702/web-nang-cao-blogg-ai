@@ -27,8 +27,12 @@ export const Footer: React.FC<FooterProps> = ({
       <div className="bg-[#001730] py-6 px-4 border-b border-[#002b54]">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#ff6b00] text-white flex items-center justify-center font-serif font-black text-xl shadow-md">
-              P
+            <div className="w-11 h-11 p-1 rounded-xl bg-white flex items-center justify-center shadow-md shrink-0">
+              <img
+                src="/logo-phenikaa.png"
+                alt="Logo Phenikaa"
+                className="w-full h-full object-contain"
+              />
             </div>
             <div>
               <h3 className="font-serif font-black text-lg text-white tracking-wide">
@@ -74,9 +78,9 @@ export const Footer: React.FC<FooterProps> = ({
             Báo Tin Tức & Giải Trí Phenikaa là cổng thông tin điện tử đa phương tiện, phản ánh nhịp sống học đường, các công trình nghiên cứu khoa học, đổi mới sáng tạo và văn hóa giải trí của cộng đồng sinh viên, giảng viên Phenikaa Group.
           </p>
           <div className="text-[11px] text-slate-400 space-y-1 pt-1">
-            <p><strong>Cơ quan chủ quản:</strong> Trường Đại học Phenikaa</p>
-            <p><strong>Tổng biên tập:</strong> Ban Truyền thông & Báo chí Phenikaa</p>
-            <p><strong>Giấy phép xuất bản:</strong> Số 2410/GP-TTĐT cấp năm 2026</p>
+            <p><strong>Cơ quan chủ quản:</strong> </p>
+            <p><strong>Tổng biên tập:</strong> </p>
+            <p><strong>Giấy phép xuất bản:</strong> </p>
           </div>
         </div>
 
@@ -92,15 +96,15 @@ export const Footer: React.FC<FooterProps> = ({
             </li>
             <li className="flex items-center gap-2">
               <Phone className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>Hotline tòa soạn: 024.6291.8118</span>
+              <span>Hotline tòa soạn: chưa có</span>
             </li>
             <li className="flex items-center gap-2">
               <Mail className="w-4 h-4 text-amber-400 shrink-0" />
-              <span>Email: toasoan@phenikaa.edu.vn</span>
+              <span>Email: 24100476@st.phenikaa-uni.edu.vn</span>
             </li>
             <li className="flex items-center gap-2">
               <Shield className="w-4 h-4 text-cyan-400 shrink-0" />
-              <span>Đường dây nóng hiến kế: 1900 1289</span>
+              <span>Đường dây :chưa có </span>
             </li>
           </ul>
         </div>
@@ -175,7 +179,7 @@ export const Footer: React.FC<FooterProps> = ({
             © 2026 Báo Tin Tức & Giải Trí Phenikaa (Phenikaa News & Entertainment). All rights reserved.
           </span>
           <span className="flex items-center gap-1 text-slate-400">
-            <span>Thiết kế cho đồ án tốt nghiệp bởi sinh viên Phenikaa</span>
+            <span>Trang web được tạo bởi sinh viên Phenikaa Nguyễn Đăng Khoa-24100476 cho bài tập lớn web nâng cao</span>
             <Heart className="w-3 h-3 text-rose-500 fill-rose-500 inline" />
           </span>
         </div>

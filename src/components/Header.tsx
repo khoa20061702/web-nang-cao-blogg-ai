@@ -18,9 +18,12 @@ export const Header: React.FC<HeaderProps> = ({
         {/* Left: Brand Logo & Title */}
         <div className="flex items-center gap-3.5 w-full md:w-auto">
           {/* Logo Mark */}
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-[#003366] via-[#00529C] to-[#0070cc] flex items-center justify-center text-white shadow-md relative overflow-hidden shrink-0 group">
-            <span className="font-serif font-black text-2xl tracking-tighter">P</span>
-            <div className="absolute -top-1 -right-1 w-4 h-4 bg-[#ff6b00] rounded-full blur-[1px]"></div>
+          <div className="w-12 h-12 flex items-center justify-center shrink-0 group">
+            <img
+              src="/logo-phenikaa.png"
+              alt="Logo Đại học Phenikaa"
+              className="w-11 h-11 object-contain group-hover:scale-105 transition-transform drop-shadow-sm"
+            />
           </div>
 
           <div>
