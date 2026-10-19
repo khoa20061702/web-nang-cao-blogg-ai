@@ -1,109 +1,160 @@
-import React from 'react';
-import { Newspaper, Sparkles, Code2, PenLine, Cpu, CheckCircle2, AlertCircle } from 'lucide-react';
-import { ApiHealthStatus } from '../types/blog.ts';
+import React, { useState } from 'react';
+import {
+  Home,
+  Newspaper,
+  Film,
+  Trophy,
+  Lightbulb,
+  Radio,
+  PenTool,
+  PlusCircle,
+  Menu,
+  X,
+  Sparkles,
+  Code2,
+} from 'lucide-react';
+import { CategoryType } from '../types/blog.ts';
 
 interface NavbarProps {
-  activeTab: 'reader' | 'editor' | 'code-guide';
-  setActiveTab: (tab: 'reader' | 'editor' | 'code-guide') => void;
-  health: ApiHealthStatus | null;
-  isLoadingHealth: boolean;
+  activeCategory: CategoryType | 'all';
+  setActiveCategory: (category: CategoryType | 'all') => void;
+  onOpenCMS: () => void;
+  onOpenAICustom: () => void;
+  onOpenCodeGuide: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
-  activeTab,
-  setActiveTab,
-  health,
-  isLoadingHealth,
+  activeCategory,
+  setActiveCategory,
+  onOpenCMS,
+  onOpenAICustom,
+  onOpenCodeGuide,
 }) => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const navItems: { label: string; category: CategoryType | 'all'; icon: any }[] = [
+    { label: 'Trang chủ', category: 'all', icon: Home },
+    { label: 'Tin Phenikaa', category: 'Tin Phenikaa', icon: Newspaper },
+    { label: 'Giải Trí & Đời Sống', category: 'Giải Trí & Đời Sống', icon: Film },
+    { label: 'Thể Thao & Bứt Phá', category: 'Thể Thao & Bứt Phá', icon: Trophy },
+    { label: 'Công Nghệ & Đổi Mới', category: 'Công Nghệ & Đổi Mới', icon: Lightbulb },
+    { label: 'Multimedia', category: 'Multimedia', icon: Radio },
+    { label: 'Góc Sinh Viên', category: 'Góc Sinh Viên', icon: PenTool },
+  ];
+
   return (
-    <header className="sticky top-0 z-40 bg-stone-900/95 backdrop-blur-md border-b border-stone-800 text-stone-100 shadow-md">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Brand Logo & Title */}
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-600 via-orange-500 to-amber-400 flex items-center justify-center text-white shadow-inner font-bold text-lg">
-              <Newspaper className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-serif font-bold text-lg tracking-tight text-stone-100">
-                  VietNews <span className="text-amber-400 font-sans text-sm font-semibold px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/20">AI</span>
-                </span>
-                <span className="hidden sm:inline-block text-xs text-stone-400 border-l border-stone-700 pl-2">
-                  Nền Tảng Báo Chí & Tóm Tắt Tự Động
-                </span>
-              </div>
-              <p className="text-[11px] text-stone-400 hidden sm:block">
-                Powered by Node.js, Express & Google Gemini API
-              </p>
-            </div>
-          </div>
+    <nav className="sticky top-0 z-40 bg-[#00529C] text-white shadow-md border-b-2 border-[#ff6b00]">
+      <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-12">
+        {/* Mobile Hamburger Button */}
+        <div className="flex items-center lg:hidden">
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="p-1.5 rounded-lg text-white hover:bg-[#004080] transition-colors focus:outline-none"
+            aria-label="Toggle menu"
+          >
+            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+          <span className="font-serif font-bold text-sm ml-2 text-white">
+            PHENIKAA MENU
+          </span>
+        </div>
 
-          {/* Navigation Tabs */}
-          <nav className="flex items-center gap-1 overflow-x-auto no-scrollbar">
-            <button
-              onClick={() => setActiveTab('reader')}
-              className={`flex items-center gap-1 px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-colors shrink-0 ${
-                activeTab === 'reader'
-                  ? 'bg-amber-500 text-stone-950 font-semibold shadow-sm'
-                  : 'text-stone-300 hover:text-white hover:bg-stone-800'
-              }`}
-            >
-              <Newspaper className="w-3.5 h-3.5 shrink-0" />
-              <span className="hidden sm:inline">Báo Chí & Tin Tức</span>
-              <span className="sm:hidden">Tin Tức</span>
-            </button>
+        {/* Desktop Navigation Links */}
+        <div className="hidden lg:flex items-center space-x-1 overflow-x-auto no-scrollbar">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeCategory === item.category;
+            return (
+              <button
+                key={item.category}
+                onClick={() => {
+                  setActiveCategory(item.category);
+                }}
+                className={`flex items-center gap-1.5 px-3 py-2 text-xs xl:text-sm font-semibold rounded-md transition-all whitespace-nowrap ${
+                  isActive
+                    ? 'bg-[#ff6b00] text-white shadow-inner font-bold'
+                    : 'text-slate-100 hover:bg-[#004080] hover:text-white'
+                }`}
+              >
+                <Icon className="w-3.5 h-3.5" />
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
+        </div>
 
-            <button
-              onClick={() => setActiveTab('editor')}
-              className={`flex items-center gap-1 px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-colors shrink-0 ${
-                activeTab === 'editor'
-                  ? 'bg-amber-500 text-stone-950 font-semibold shadow-sm'
-                  : 'text-stone-300 hover:text-white hover:bg-stone-800'
-              }`}
-            >
-              <PenLine className="w-3.5 h-3.5 shrink-0" />
-              <span className="hidden sm:inline">Studio Tóm Tắt</span>
-              <span className="sm:hidden">Studio</span>
-            </button>
+        {/* Right Action Buttons */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={onOpenAICustom}
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded text-xs font-semibold bg-[#ff6b00] hover:bg-[#e05e00] text-white transition-all shadow-sm"
+            title="Mở Studio tóm tắt văn bản bằng AI"
+          >
+            <Sparkles className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">AI Studio</span>
+          </button>
 
-            <button
-              onClick={() => setActiveTab('code-guide')}
-              className={`flex items-center gap-1 px-2 sm:px-3 py-1.5 text-xs sm:text-sm font-medium rounded-lg transition-colors shrink-0 ${
-                activeTab === 'code-guide'
-                  ? 'bg-amber-500 text-stone-950 font-semibold shadow-sm'
-                  : 'text-stone-300 hover:text-white hover:bg-stone-800'
-              }`}
-            >
-              <Code2 className="w-3.5 h-3.5 shrink-0" />
-              <span className="hidden md:inline">Mã Nguồn & Hướng Dẫn</span>
-              <span className="md:hidden sm:inline">Mã Nguồn</span>
-              <span className="sm:hidden">Code</span>
-            </button>
-          </nav>
-
-          {/* API Health / Live Indicator */}
-          <div className="hidden lg:flex items-center gap-2">
-            <div className="flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-md bg-stone-800/80 border border-stone-700">
-              <Cpu className="w-3.5 h-3.5 text-amber-400" />
-              <span className="text-stone-300">Backend API:</span>
-              {isLoadingHealth ? (
-                <span className="text-stone-400 animate-pulse">Đang kết nối...</span>
-              ) : health?.hasApiKey ? (
-                <span className="flex items-center gap-1 text-emerald-400 font-medium">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
-                  gemini-3.8-flash (Sẵn sàng)
-                </span>
-              ) : (
-                <span className="flex items-center gap-1 text-amber-300 font-medium">
-                  <AlertCircle className="w-3 h-3 text-amber-400" />
-                  Chưa nhận diện API Key
-                </span>
-              )}
-            </div>
-          </div>
+          <button
+            onClick={onOpenCMS}
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded text-xs font-semibold bg-white text-[#00529C] hover:bg-slate-100 transition-all shadow-sm"
+            title="Đăng bài viết mới & Quản lý nội dung"
+          >
+            <PlusCircle className="w-3.5 h-3.5 text-[#ff6b00]" />
+            <span className="hidden sm:inline">Đăng Bài (CMS)</span>
+          </button>
         </div>
       </div>
-    </header>
+
+      {/* Mobile Drawer Menu */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden bg-[#00386b] border-t border-[#00488a] px-4 py-3 space-y-1.5 animate-in slide-in-from-top-2">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeCategory === item.category;
+            return (
+              <button
+                key={item.category}
+                onClick={() => {
+                  setActiveCategory(item.category);
+                  setMobileMenuOpen(false);
+                }}
+                className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium rounded-lg text-left transition-colors ${
+                  isActive
+                    ? 'bg-[#ff6b00] text-white font-bold'
+                    : 'text-slate-200 hover:bg-[#00488a] hover:text-white'
+                }`}
+              >
+                <Icon className="w-4 h-4 text-amber-400" />
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
+
+          <div className="pt-2 border-t border-[#00488a] flex flex-col gap-2">
+            <button
+              onClick={() => {
+                onOpenAICustom();
+                setMobileMenuOpen(false);
+              }}
+              className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span>Studio Tóm Tắt Tự Do (AI Sandbox)</span>
+            </button>
+
+            <button
+              onClick={() => {
+                onOpenCodeGuide();
+                setMobileMenuOpen(false);
+              }}
+              className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg bg-[#00284d] text-amber-300"
+            >
+              <Code2 className="w-4 h-4" />
+              <span>Xem Mã Nguồn Node.js Express</span>
+            </button>
+          </div>
+        </div>
+      )}
+    </nav>
   );
 };

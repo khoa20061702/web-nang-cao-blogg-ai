@@ -1,75 +1,350 @@
-import { BlogPost } from '../types/blog.ts';
+import { BlogPost, TimelineNewsItem, MultimediaItem } from '../types/blog.ts';
 
 export const INITIAL_POSTS: BlogPost[] = [
+  // 1. BÀI VIẾT TIÊU ĐIỂM LỚN NHẤT (Main Featured)
   {
-    id: 'post-1',
-    title: 'Làn sóng AI tại Việt Nam: Cơ hội và thách thức cho thế hệ kỹ sư mới',
-    category: 'Công nghệ',
-    author: 'Nguyễn Văn Minh - Tech Journalist',
-    publishedAt: '19/10/2026',
-    readTime: '6 phút đọc',
-    excerpt: 'Việt Nam đang trở thành một trong những điểm nóng về ứng dụng trí tuệ nhân tạo tại Đông Nam Á với sự đầu tư mạnh mẽ từ các tập đoàn và hệ sinh thái khởi nghiệp.',
-    coverImage: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80',
-    tags: ['Trí tuệ nhân tạo', 'Gemini API', 'Node.js', 'Kỹ sư Việt'],
-    content: `Trong giai đoạn 2024 - 2026, Việt Nam đã chứng kiến bước chuyển mình ngoạn mục trong việc tiếp cận và phát triển công nghệ trí tuệ nhân tạo (AI). Từ một thị trường chủ yếu gia công phần mềm truyền thống, các doanh nghiệp công nghệ trong nước như FPT, Viettel, Vingroup và hàng loạt startup công nghệ tài chính (Fintech), thương mại điện tử đã chủ động tích hợp các mô hình ngôn ngữ lớn (LLMs) vào hoạt động kinh doanh cốt lõi.
-
-Theo báo cáo của Hiệp hội Trí tuệ Nhân tạo Việt Nam, hơn 68% doanh nghiệp công nghệ vừa và lớn đã triển khai ít nhất một tính năng hỗ trợ bằng AI trong quy trình quản trị hoặc chăm sóc khách hàng. Đặc biệt, việc Google công bố các dòng mô hình Gemini thế hệ mới với khả năng hiểu sâu sắc ngữ cảnh tiếng Việt đã mở ra cánh cửa cho các nhà phát triển xây dựng các hệ sinh thái báo chí thông minh, tóm tắt dữ liệu thời gian thực và phân tích hành vi độc giả.
-
-Tuy nhiên, thách thức lớn nhất đối với cộng đồng kỹ sư phần mềm Việt Nam hiện nay nằm ở chất lượng hạ tầng dữ liệu và bài toán tối ưu chi phí vận hành API. Việc xử lý ngôn ngữ tiếng Việt đòi hỏi các kỹ sư phải hiểu rõ cấu trúc câu, thanh điệu ngữ âm và cách thiết kế System Prompt nghiêm ngặt để mô hình không bị "ảo giác" (hallucination) hoặc trả về văn phong dịch thuật gượng gạo. Hơn nữa, vấn đề bảo mật thông tin và quyền riêng tư theo Nghị định bảo vệ dữ liệu cá nhân (PDPD) cũng đặt ra yêu cầu các hệ thống backend Node.js phải tuân thủ nghiêm ngặt chuẩn mực bảo mật, không để lộ API Key trên phía client.
-
-Nhìn chung, làn sóng AI không chỉ là trào lưu nhất thời mà đã định hình lại tiêu chuẩn của một sản phẩm số tại Việt Nam. Những lập trình viên làm chủ được việc kết hợp giữa backend Express.js vững chắc và các API AI hiện đại sẽ nắm giữ chìa khóa dẫn dắt kỷ nguyên số tiếp theo.`,
-  },
-  {
-    id: 'post-2',
-    title: 'Quy hoạch điện VIII và bước ngoặt chuyển dịch năng lượng tái tạo tại Việt Nam',
-    category: 'Kinh tế',
-    author: 'Trần Thị Thu Hà - Chuyên gia Năng lượng',
-    publishedAt: '18/10/2026',
+    id: 'post-phenikaa-featured',
+    title: 'Tập đoàn Phenikaa & Đại học Phenikaa công bố Trung tâm Nghiên cứu Trí tuệ Nhân tạo và Vi mạch Bán dẫn Thế hệ Mới',
+    category: 'Tin Phenikaa',
+    author: 'Ban Biên Tập Phenikaa News',
+    authorRole: 'Cơ quan truyền thông Đại học Phenikaa',
+    publishedAt: '19/10/2026 08:30',
     readTime: '5 phút đọc',
-    excerpt: 'Mục tiêu đạt phát thải ròng bằng 0 (Net Zero) vào năm 2050 đang thúc đẩy các dự án điện gió ngoài khơi và năng lượng mặt trời mái nhà phát triển với tốc độ kỷ lục.',
-    coverImage: 'https://images.unsplash.com/photo-1466611653911-95081537e5b7?auto=format&fit=crop&w=800&q=80',
-    tags: ['Năng lượng sạch', 'Quy hoạch điện VIII', 'Net Zero', 'Kinh tế số'],
-    content: `Quy hoạch phát triển điện lực quốc gia thời kỳ 2021 - 2030, tầm nhìn đến năm 2050 (Quy hoạch điện VIII) đang đi vào giai đoạn then chốt với hàng loạt chính sách khuyến khích năng lượng tái tạo được cụ thể hóa. Với cam kết mạnh mẽ tại Hội nghị COP26 về việc đưa phát thải ròng về 0 vào giữa thế kỷ, Việt Nam xác định điện mặt trời và điện gió là hai trụ cột chính để đảm bảo an ninh năng lượng quốc gia.
+    isFeatured: true,
+    excerpt: 'Với quy mô đầu tư hơn 500 tỷ đồng, tổ hợp nghiên cứu AI & Chip bán dẫn tại cơ sở Hà Đông chính thức đi vào vận hành, mở ra cơ hội thực chiến đột phá cho sinh viên và các nhà khoa học Phenikaa.',
+    coverImage: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1200&q=80',
+    tags: ['Phenikaa Group', 'Bán Dẫn', 'Trí Tuệ Nhân Tạo', 'Đại Học Phenikaa', 'Đổi Mới Sáng Tạo'],
+    viewsCount: 14250,
+    status: 'published',
+    reactions: { like: 342, heart: 189, haha: 12, wow: 88, sad: 2 },
+    comments: [
+      {
+        id: 'c1',
+        author: 'Nguyễn Tuấn Dũng',
+        role: 'Sinh viên K17 - Khoa CNTT',
+        text: 'Tự hào là sinh viên Phenikaa! Phòng Lab vi mạch này trang bị máy tính và thiết bị đo kiểm siêu xịn, háo hức được đăng ký thực tập kỳ này.',
+        createdAt: '10 phút trước',
+        likes: 24,
+      },
+      {
+        id: 'c2',
+        author: 'TS. Lê Hoàng Mai',
+        role: 'Viện Nghiên cứu Tiên tiến Phenikaa',
+        text: 'Một bước đi chiến lược đón đầu làn sóng dịch chuyển chuỗi cung ứng công nghệ cao toàn cầu. Chúc mừng nhà trường!',
+        createdAt: '35 phút trước',
+        likes: 45,
+      },
+    ],
+    content: `Sáng ngày 19/10/2026, tại khuôn viên trường Đại học Phenikaa (Đường Tố Hữu, Nam Từ Liêm, Hà Nội), Tập đoàn Phenikaa phối hợp cùng các đối tác công nghệ hàng đầu thế giới đã long trọng tổ chức Lễ khánh thành Trung tâm Nghiên cứu Trí tuệ Nhân tạo & Thiết kế Vi mạch Bán dẫn (Phenikaa AI & Semiconductor Center - PASC).
 
-Dọc bờ biển miền Trung và Nam Trung Bộ, hàng loạt dự án điện gió ngoài khơi với tổng công suất dự kiến đạt 6.000 MW vào năm 2030 đang thu hút sự quan tâm của các tập đoàn đa quốc gia từ Đan Mạch, Nhật Bản và Đức. Ưu thế về chiều dài bờ biển hơn 3.260 km cùng vận tốc gió ổn định từ 7-9 m/s biến Việt Nam thành điểm đến lý tưởng cho ngành công nghiệp điện gió ngoài khơi.
+Sự kiện đánh dấu bước ngoặt mang tính chiến lược trong triết lý "Đại học Trải nghiệm - Đổi mới Sáng tạo" của Phenikaa. Trung tâm được trang bị hệ thống siêu máy tính máy chủ GPU chuyên dụng cho huấn luyện mô hình học sâu, phòng sạch đạt tiêu chuẩn quốc tế và bản quyền phần mềm thiết kế vi mạch chuyên sâu từ Synopsys và Cadence.
 
-Song song đó, cơ chế mua bán điện trực tiếp (DPPA) vừa được ban hành đã tạo đột phá cho các doanh nghiệp FDI công nghệ cao như Samsung, Intel và Foxconn tự chủ nguồn năng lượng tái tạo phục vụ sản xuất. Tuy nhiên, thách thức kỹ thuật lớn nhất vẫn là bài toán giải tỏa công suất lưới điện truyền tải 500kV Bắc - Nam và đầu tư hệ thống pin lưu trữ năng lượng (BESS) quy mô lớn để khắc phục tính bất định của thời tiết.
+Phát biểu tại lễ ra mắt, đại diện Lãnh đạo Tập đoàn Phenikaa khẳng định: "Chúng tôi cam kết xây dựng một hệ sinh thái khép kín từ đào tạo lý thuyết, nghiên cứu ứng dụng đến ươm tạo doanh nghiệp khởi nghiệp ngay trong lòng trường đại học. Sinh viên Phenikaa từ năm thứ 2 đã được tham gia trực tiếp vào các dự án thương mại hóa, giải quyết bài toán giao thông thông minh, xe tự hành Phenikaa-X và thiết bị chiếu sáng vì sức khỏe con người Phenikaa Lighting".
 
-Giới chuyên gia nhận định, để đạt được mục tiêu kép vừa tăng trưởng kinh tế vừa giảm phát thải, Việt Nam cần sớm hoàn thiện khung pháp lý về giá điện hai thành phần và tăng cường hợp tác công - tư (PPP) trong phát triển hạ tầng truyền tải thông minh.`,
+Trung tâm PASC dự kiến cung cấp mỗi năm hơn 500 kỹ sư vi mạch bán dẫn và chuyên gia AI chất lượng cao, phục vụ cho nhu cầu cấp bách của các tập đoàn công nghệ toàn cầu tại Việt Nam.`,
+  },
+
+  // 2. 04 BÀI VIẾT TIÊU ĐIỂM PHỤ (Sub-featured Row)
+  {
+    id: 'post-sub-1',
+    title: 'Khai mạc giải bóng đá thường niên Phenikaa Cup 2026: 32 đội bóng tranh tài nảy lửa',
+    category: 'Thể Thao & Bứt Phá',
+    author: 'CLB Thể Thao Phenikaa (PSC)',
+    authorRole: 'Phóng viên Thể thao sinh viên',
+    publishedAt: '19/10/2026 10:15',
+    readTime: '3 phút đọc',
+    isSubFeatured: true,
+    excerpt: 'Sân vận động cỏ nhân tạo Phenikaa bùng nổ không khí cuồng nhiệt trong trận derby mở màn giữa Khoa CNTT và Viện Công nghệ Sinh học.',
+    coverImage: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=600&q=80',
+    tags: ['Phenikaa Cup', 'Bóng Đá', 'Sinh Viên', 'Thể Thao'],
+    viewsCount: 8900,
+    status: 'published',
+    reactions: { like: 210, heart: 98, haha: 34, wow: 15, sad: 0 },
+    comments: [
+      {
+        id: 'c-sub1',
+        author: 'Trần Văn Long',
+        role: 'Đội trưởng CNTT FC',
+        text: 'Năm nay quyết tâm mang cúp vô địch về cho khoa CNTT nhé anh em!',
+        createdAt: '1 giờ trước',
+        likes: 18,
+      },
+    ],
+    content: `Giải bóng đá sinh viên Phenikaa Cup 2026 đã chính thức lăn bóng vào sáng nay với sự tham gia của 32 đội tuyển đại diện cho các khoa, viện và câu lạc bộ toàn trường. Trận khai mạc giữa đương kim vô địch Khoa Công nghệ Thông tin và "chú ngựa ô" Viện Công nghệ Sinh học đã diễn ra với tốc độ nghẹt thở, cống hiến 5 bàn thắng đẹp mắt làm nức lòng hàng ngàn cổ động viên trên khán đài.`,
   },
   {
-    id: 'post-3',
-    title: 'Sài Gòn và văn hóa cà phê không ngủ: Nhịp sống số của thế hệ Gen Z',
-    category: 'Đời sống',
-    author: 'Lê Hoàng Nam - Urban Life',
-    publishedAt: '17/10/2026',
+    id: 'post-sub-2',
+    title: 'Đêm nhạc hội Phenikaa Youth Fest 2026: Dàn sao V-Pop "cháy" hết mình cùng 10.000 sinh viên',
+    category: 'Giải Trí & Đời Sống',
+    author: 'Đoàn Thanh Niên & Hội Sinh Viên',
+    authorRole: 'Ban Văn hóa & Nghệ thuật',
+    publishedAt: '18/10/2026 21:00',
     readTime: '4 phút đọc',
-    excerpt: 'Từ những quán cà phê cóc ven đường đến các không gian co-working mở 24/7, văn hóa cà phê Sài Gòn đang chứng kiến sự giao thoa ấn tượng giữa nét truyền thống và lối sống du mục kỹ thuật số.',
-    coverImage: 'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80',
-    tags: ['Sài Gòn', 'Văn hóa sống', 'Gen Z', 'Digital Nomad'],
-    content: `Tại Thành phố Hồ Chí Minh, cà phê từ lâu không chỉ đơn thuần là một món đồ uống buổi sớm mà đã trở thành phong cách sống và nhịp thở của cả một đô thị năng động. Những ly cà phê sữa đá pha phin đậm đà hương vị truyền thống trên hè phố Nguyễn Du hay Nhà thờ Đức Bà vẫn tồn tại nguyên vẹn, song song cùng sự xuất hiện của những chuỗi không gian cà phê mở cửa xuyên đêm 24/7.
-
-Đối với thế hệ Gen Z và những người làm việc tự do (digital nomads), quán cà phê nay đóng vai trò như một văn phòng làm việc mở, nơi hội tụ của sự sáng tạo và kết nối xã hội. Chỉ với một chiếc laptop, tai nghe chống ồn và ly cà phê cold brew thơm mát, các kỹ sư phần mềm, nhà thiết kế đồ họa hay người sáng tạo nội dung có thể làm việc và thảo luận dự án suốt nhiều giờ liền.
-
-Đáng chú ý, văn hóa này được thúc đẩy mạnh mẽ bởi làn sóng số hóa toàn diện: 100% các quán cà phê đều trang bị mã QR thanh toán qua ứng dụng ngân hàng hoặc ví điện tử, hệ thống Wi-Fi băng thông cao tốc độ Gigabit và các tiện ích đặt món trước qua ứng dụng. Nhịp sống cà phê Sài Gòn vì thế vừa giữ được cái hồn phóng khoáng, hào sảng vốn có, vừa không ngừng đổi mới để bắt nhịp cùng xu thế chuyển đổi số hiện đại của thế giới.`,
+    isSubFeatured: true,
+    excerpt: 'Sân khấu âm thanh ánh sáng triệu đô tại quảng trường chính đã biến đêm hội chào tân sinh viên thành bữa tiệc âm nhạc và cảm xúc khó quên.',
+    coverImage: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=600&q=80',
+    tags: ['Phenikaa Youth Fest', 'Showbiz', 'Âm Nhạc', 'Gen Z', 'Lễ Hội'],
+    viewsCount: 12400,
+    status: 'published',
+    reactions: { like: 580, heart: 430, haha: 12, wow: 110, sad: 1 },
+    comments: [
+      {
+        id: 'c-sub2',
+        author: 'Nguyễn Quỳnh Anh',
+        role: 'Tân sinh viên K18',
+        text: 'Visual sân khấu đỉnh của chóp! Ca sĩ thần tượng hát live cực ngọt, không uổng công đứng xếp hàng từ chiều.',
+        createdAt: 'Hôm qua',
+        likes: 56,
+      },
+    ],
+    content: `Phenikaa Youth Fest 2026 - đại nhạc hội chào đón tân sinh viên lớn nhất năm đã diễn ra trong không khí bùng nổ chưa từng có. Với sự góp mặt của dàn nghệ sĩ trẻ đình đám trong làng giải trí cùng các tiết mục tài năng được dàn dựng công phu từ các CLB Nghệ thuật Phenikaa (PAC, CLB Nhảy, Guitar), đêm nhạc đã mang lại nguồn năng lượng tích cực cho toàn thể sinh viên.`,
   },
   {
-    id: 'post-4',
-    title: 'Engineering High-Performance AI Microservices with Node.js and Express',
-    category: 'Global Tech',
-    author: 'Alex Henderson - Principal Backend Architect',
-    publishedAt: '16/10/2026',
-    readTime: '5 min read',
-    excerpt: 'A comprehensive engineering guide on building scalable, resilient Express.js API gateways that orchestrate large language models like Google Gemini in production.',
-    coverImage: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80',
-    tags: ['Architecture', 'Node.js', 'Express', 'Microservices'],
-    content: `Integrating modern generative AI capabilities into digital publishing platforms requires backend engineers to rethink traditional request-response architectures. While invoking an LLM endpoint looks as simple as an HTTP POST request, real-world high-throughput platforms must navigate rate limiting, variable inference latencies, context window optimization, and prompt injection defense.
+    id: 'post-sub-3',
+    title: 'Sinh viên Phenikaa giành Quán quân Cuộc thi Sáng tạo Robot & AI Châu Á - Thái Bình Dương',
+    category: 'Công Nghệ & Đổi Mới',
+    author: 'Phạm Minh Trí',
+    authorRole: 'CLB Robotics Phenikaa',
+    publishedAt: '18/10/2026 14:20',
+    readTime: '4 phút đọc',
+    isSubFeatured: true,
+    excerpt: 'Đội tuyển Phenikaa Maker vượt qua 45 đối thủ quốc tế nhờ giải pháp robot tuần tra thông minh tích hợp trí tuệ nhân tạo thị giác máy tính.',
+    coverImage: 'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=600&q=80',
+    tags: ['Robotics', 'Giải Thưởng', 'Sinh Viên Nghiên Cứu', 'AI Vision'],
+    viewsCount: 7600,
+    status: 'published',
+    reactions: { like: 390, heart: 245, haha: 2, wow: 78, sad: 0 },
+    comments: [],
+    content: `Đội tuyển Robotics trường Đại học Phenikaa vừa xuất sắc bước lên bục vinh quang cao nhất tại Vòng chung kết Cuộc thi Sáng tạo Robot & AI Sinh viên Châu Á - Thái Bình Dương tổ chức tại Tokyo, Nhật Bản. Mẫu robot tự hành của nhóm gây ấn tượng mạnh với hội đồng giám khảo quốc tế nhờ khả năng phân tích địa hình 3D và thuật toán tự cân bằng tối ưu năng lượng.`,
+  },
+  {
+    id: 'post-sub-4',
+    title: 'Podcast Radio Phenikaa Tập 24: "Gen Z làm chủ AI hay để AI dẫn dắt tương lai?"',
+    category: 'Multimedia',
+    author: 'Ban Phát Thanh Phenikaa Radio',
+    authorRole: 'Tổ hợp Truyền thông Đa phương tiện',
+    publishedAt: '17/10/2026 19:45',
+    readTime: '3 phút đọc',
+    isSubFeatured: true,
+    excerpt: 'Lắng nghe những chia sẻ thẳng thắn từ các thủ khoa đầu ra và chuyên gia công nghệ về cách thế hệ trẻ biến công cụ AI thành đòn bẩy sự nghiệp.',
+    coverImage: 'https://images.unsplash.com/photo-1590602847861-f357a9332bbc?auto=format&fit=crop&w=600&q=80',
+    tags: ['Podcast', 'Phenikaa Radio', 'Hướng Nghiệp', 'Gen Z'],
+    viewsCount: 6540,
+    status: 'published',
+    reactions: { like: 195, heart: 140, haha: 5, wow: 29, sad: 0 },
+    comments: [],
+    content: `Trong số phát sóng tuần này, Phenikaa Radio đưa người nghe đến với góc nhìn thực tế của việc ứng dụng các mô hình AI mới như Google Gemini trong việc học tập và nghiên cứu. Làm sao để không bị phụ thuộc vào câu trả lời có sẵn mà vẫn duy trì tư duy phản biện sắc bén? Cùng lắng nghe cuộc trò chuyện với các diễn giả khách mời.`,
+  },
 
-When designing the API gateway with Node.js and Express, three architectural pillars must be addressed:
-First, strict input validation and payload bounds. Accepting arbitrary text payloads without length constraints exposes the service to memory exhaustion attacks and unnecessary API token costs. Enforcing character length thresholds and sanitizing inputs before invoking the model ensures operational reliability.
+  // 3. KHỐI CHUYÊN MỤC "GIẢI TRÍ PHENIKAA" (Card View)
+  {
+    id: 'post-ent-1',
+    title: 'Khám phá 5 CLB Nghệ thuật "hot hit" nhất Phenikaa khiến tân sinh viên mê mẩn',
+    category: 'Giải Trí & Đời Sống',
+    author: 'Vũ Thùy Linh',
+    authorRole: 'Cộng tác viên Giải Trí',
+    publishedAt: '17/10/2026 11:30',
+    readTime: '4 phút đọc',
+    excerpt: 'Từ ban nhạc rock, nhóm nhảy đường phố K-Pop đến CLB Điện ảnh & Nhiếp ảnh, đời sống ngoại khóa tại Phenikaa luôn tràn đầy màu sắc và đam mê.',
+    coverImage: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=600&q=80',
+    tags: ['CLB', 'Ngoại Khóa', 'Đời Sống', 'Âm Nhạc'],
+    viewsCount: 5200,
+    reactions: { like: 180, heart: 140, haha: 8, wow: 12, sad: 1 },
+    comments: [],
+    content: `Không chỉ nổi tiếng về cơ sở vật chất hiện đại, trường Đại học Phenikaa còn là cái nôi nuôi dưỡng tinh thần nghệ thuật tự do với hơn 40 câu lạc bộ sinh viên hoạt động sôi nổi. Dù bạn là người đam mê guitar acoustic mộc mạc hay muốn tỏa sáng trong những vũ điệu hip-hop sôi động, luôn có một sân chơi dành cho bạn.`,
+  },
+  {
+    id: 'post-ent-2',
+    title: 'Trend check-in "Góc Paris giữa lòng Phenikaa": Tòa nhà thư viện thông minh lên sóng triệu view',
+    category: 'Giải Trí & Đời Sống',
+    author: 'Bảo Trâm',
+    authorRole: 'Reviewer Campus',
+    publishedAt: '16/10/2026 16:15',
+    readTime: '3 phút đọc',
+    excerpt: 'Những góc sống ảo sang xịn mịn tại khuôn viên trường đang gây sốt trên TikTok và Instagram, thu hút hàng ngàn lượt tương tác từ giới trẻ.',
+    coverImage: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=600&q=80',
+    tags: ['Check-in', 'Campus Life', 'TikTok Trend', 'Thư Viện'],
+    viewsCount: 11200,
+    reactions: { like: 420, heart: 310, haha: 25, wow: 64, sad: 0 },
+    comments: [],
+    content: `Với kiến trúc hiện đại hòa quyện cùng không gian cây xanh mát rượi, mỗi góc tại Đại học Phenikaa đều có thể trở thành phông nền tuyệt vời cho những bức ảnh nghệ thuật. Đặc biệt, khu vực giếng trời thư viện và cầu kính kết nối các tòa nhà đang là điểm check-in không thể bỏ lỡ của sinh viên.`,
+  },
+  {
+    id: 'post-ent-3',
+    title: 'Review món ngon "thiên đường ẩm thực" cổng phụ Phenikaa: Ngon - Bổ - Rẻ chuẩn sinh viên',
+    category: 'Giải Trí & Đời Sống',
+    author: 'Foody Phenikaa Team',
+    authorRole: 'Hội Mê Ăn Uống Phenikaa',
+    publishedAt: '15/10/2026 18:00',
+    readTime: '3 phút đọc',
+    excerpt: 'Cùng dạo quanh phố ẩm thực sinh viên với bún đậu mắm tôm, nem nướng Nha Trang, trà sữa nướng Vân Nam giá chỉ từ 20k.',
+    coverImage: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=600&q=80',
+    tags: ['Ẩm Thực', 'Food Tour', 'Sinh Viên', 'Hà Đông'],
+    viewsCount: 9400,
+    reactions: { like: 310, heart: 280, haha: 42, wow: 19, sad: 2 },
+    comments: [],
+    content: `Sau những giờ học tập căng thẳng tại giảng đường, thiên đường ẩm thực xung quanh trường luôn là điểm dừng chân lý tưởng. Giá cả phải chăng, đồ ăn tươi ngon và sự hiếu khách của các cô chú chủ quán đã tạo nên nét văn hóa ẩm thực sinh viên rất riêng của Phenikaa.`,
+  },
 
-Second, structured output enforcement using schemas. Early LLM implementations relied on regex parsing of unpredictable markdown responses. With modern SDKs like @google/genai, developers can define strict response schemas with exact typed properties (such as headlines, arrays of bullet points, and key takeaways), eliminating parsing exceptions and hallucinated formatting.
+  // 4. KHỐI CHUYÊN MỤC "TIN TỨC & CÔNG NGHỆ" (List Media View)
+  {
+    id: 'post-tech-1',
+    title: 'Xe tự hành Phenikaa-X cấp độ 4: Hoàn thành 50.000 km thử nghiệm an toàn tuyệt đối',
+    category: 'Công Nghệ & Đổi Mới',
+    author: 'TS. Hoàng Đức Anh',
+    authorRole: 'Trưởng nhóm Nghiên cứu Phenikaa-X',
+    publishedAt: '16/10/2026 09:00',
+    readTime: '5 phút đọc',
+    excerpt: 'Dự án xe tự hành Make in Vietnam của Phenikaa đã vượt qua các bài kiểm tra thực địa khắc nghiệt trong đô thị thông minh và khu du lịch sinh thái.',
+    coverImage: 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?auto=format&fit=crop&w=600&q=80',
+    tags: ['Phenikaa-X', 'Xe Tự Hành', 'Autonomous Vehicle', 'Make in Vietnam'],
+    viewsCount: 6800,
+    reactions: { like: 260, heart: 120, haha: 4, wow: 65, sad: 0 },
+    comments: [],
+    content: `Được nghiên cứu và phát triển hoàn toàn bởi đội ngũ kỹ sư và nhà khoa học người Việt tại Tập đoàn Phenikaa, mẫu xe tự hành Phenikaa-X sở hữu hệ thống cảm biến LiDAR 3D, camera AI nhận diện vật cản thời gian thực và độ trễ phản hồi dưới 10 mili-giây.`,
+  },
+  {
+    id: 'post-tech-2',
+    title: 'Học bổng Tài năng Phenikaa 2026: Quỹ 50 tỷ đồng mở rộng cho sinh viên xuất sắc khối STEM',
+    category: 'Tin Phenikaa',
+    author: 'Phòng Tuyển sinh & Truyền thông',
+    authorRole: 'Đại học Phenikaa',
+    publishedAt: '15/10/2026 14:00',
+    readTime: '4 phút đọc',
+    excerpt: 'Chính sách học bổng miễn 100% học phí toàn khóa kèm sinh hoạt phí hàng tháng tiếp tục là động lực thu hút nhân tài khắp cả nước.',
+    coverImage: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=600&q=80',
+    tags: ['Học Bổng', 'Tài Năng', 'Tuyển Sinh', 'STEM'],
+    viewsCount: 8400,
+    reactions: { like: 410, heart: 320, haha: 3, wow: 30, sad: 0 },
+    comments: [],
+    content: `Với sứ mệnh hiện thực hóa ước mơ đại học cho mọi tài năng trẻ bất kể hoàn cảnh kinh tế, Quỹ Học bổng Phenikaa 2026 tiếp tục trao tặng hàng trăm suất học bổng toàn phần danh giá cùng cơ hội tuyển dụng trực tiếp vào các công ty thành viên của Tập đoàn Phenikaa ngay sau khi tốt nghiệp.`,
+  },
+  {
+    id: 'post-tech-3',
+    title: 'Góc Sinh Viên Hiến Kế: "Ứng dụng trợ lý ảo AI Phenikaa Assistant hỗ trợ tra cứu lịch học"',
+    category: 'Góc Sinh Viên',
+    author: 'Lê Quang Huy',
+    authorRole: 'Sinh viên K16 Khoa Khoa học Dữ liệu',
+    publishedAt: '14/10/2026 10:30',
+    readTime: '4 phút đọc',
+    excerpt: 'Một ý tưởng hiến kế xuất sắc từ sinh viên về việc tích hợp API Gemini vào ứng dụng MyPhenikaa giúp trả lời tự động mọi thắc mắc của sinh viên.',
+    coverImage: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=600&q=80',
+    tags: ['Hiến Kế', 'Góc Sinh Viên', 'Chatbot AI', 'MyPhenikaa'],
+    viewsCount: 4900,
+    reactions: { like: 280, heart: 190, haha: 6, wow: 45, sad: 1 },
+    comments: [],
+    content: `Nhận thấy các bạn sinh viên thường xuyên gặp khó khăn khi tra cứu phòng học thi, lịch thi lại và đăng ký tín chỉ vào đầu kỳ, nhóm sinh viên chúng em đã đề xuất mô hình tích hợp trợ lý AI thông minh có khả năng đồng bộ dữ liệu thời khóa biểu trực tiếp.`,
+  },
+];
 
-Third, resilient error handling and defensive telemetry. Network timeouts and quota limits are inevitable when scaling AI features. Implementing intelligent retry strategies, circuit breakers, and descriptive HTTP status codes (such as 400 for malformed input and 429 for rate limits) guarantees a seamless experience for frontend client consumers.`,
+// DÒNG THỜI GIAN MỚI NHẤT 24/7 (SIDEBAR)
+export const TIMELINE_NEWS: TimelineNewsItem[] = [
+  {
+    id: 'tl-1',
+    time: '10:15',
+    title: 'Khai mạc giải bóng đá Phenikaa Cup 2026 tại Sân vận động trường',
+    category: 'Thể Thao & Bứt Phá',
+    badge: 'MỚI NHẤT',
+  },
+  {
+    id: 'tl-2',
+    time: '09:30',
+    title: 'Hội thảo Quốc tế về Trí tuệ Nhân tạo & Bán dẫn tại Hội trường A2',
+    category: 'Công Nghệ & Đổi Mới',
+    badge: 'NỔI BẬT',
+  },
+  {
+    id: 'tl-3',
+    time: '08:45',
+    title: 'CLB Nhiếp ảnh Phenikaa mở đơn đăng ký triển lãm ảnh mùa thu "Sắc Màu Phenikaa"',
+    category: 'Giải Trí & Đời Sống',
+  },
+  {
+    id: 'tl-4',
+    time: '08:00',
+    title: 'Thông báo xét cấp học bổng Khuyến khích học tập học kỳ 1 năm học 2026-2027',
+    category: 'Tin Phenikaa',
+  },
+  {
+    id: 'tl-5',
+    time: '07:15',
+    title: 'Đoàn trường phát động cuộc thi "Ý tưởng Xanh & Sống Đẹp Sinh Viên Phenikaa"',
+    category: 'Góc Sinh Viên',
+  },
+  {
+    id: 'tl-6',
+    time: '06:30',
+    title: 'Dự báo thời tiết Hà Đông: 26°C, trời quang đãng, lý tưởng cho các hoạt động thể thao ngoài trời',
+    category: 'Giải Trí & Đời Sống',
+  },
+];
+
+// TOP 5 BÀI VIẾT TRENDING / ĐỌC NHIỀU NHẤT
+export const TRENDING_POSTS = [
+  {
+    rank: '01',
+    id: 'post-phenikaa-featured',
+    title: 'Tập đoàn Phenikaa ra mắt Trung tâm Nghiên cứu AI và Vi mạch Bán dẫn',
+    category: 'Tin Phenikaa',
+    views: '14.2K lượt đọc',
+  },
+  {
+    rank: '02',
+    id: 'post-sub-2',
+    title: 'Đêm nhạc hội Phenikaa Youth Fest 2026 bùng nổ cùng 10.000 sinh viên',
+    category: 'Giải Trí & Đời Sống',
+    views: '12.4K lượt đọc',
+  },
+  {
+    rank: '03',
+    id: 'post-ent-2',
+    title: 'Trend check-in "Góc Paris giữa lòng Phenikaa": Tòa nhà thư viện triệu view',
+    category: 'Giải Trí & Đời Sống',
+    views: '11.2K lượt đọc',
+  },
+  {
+    rank: '04',
+    id: 'post-sub-1',
+    title: 'Khai mạc giải bóng đá thường niên Phenikaa Cup: 32 đội bóng tranh tài',
+    category: 'Thể Thao & Bứt Phá',
+    views: '8.9K lượt đọc',
+  },
+  {
+    rank: '05',
+    id: 'post-tech-2',
+    title: 'Quỹ Học bổng Tài năng Phenikaa 50 tỷ đồng mở rộng cho sinh viên STEM',
+    category: 'Tin Phenikaa',
+    views: '8.4K lượt đọc',
+  },
+];
+
+// MULTIMEDIA ITEMS (VIDEO / PODCAST / ALBUM)
+export const MULTIMEDIA_ITEMS: MultimediaItem[] = [
+  {
+    id: 'media-1',
+    title: 'Toàn cảnh Lễ khánh thành Trung tâm Bán dẫn & Trí tuệ Nhân tạo Phenikaa',
+    type: 'video',
+    duration: '04:25',
+    cover: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80',
+    views: '4.8K views',
+    description: 'Video phóng sự ghi lại những khoảnh khắc ấn tượng nhất trong sự kiện công nghệ của năm.',
+  },
+  {
+    id: 'media-2',
+    title: 'Podcast Phenikaa Radio: Trò chuyện cùng Thủ khoa tốt nghiệp xuất sắc K13',
+    type: 'podcast',
+    duration: '22:18',
+    cover: 'https://images.unsplash.com/photo-1590602847861-f357a9332bbc?auto=format&fit=crop&w=600&q=80',
+    views: '3.1K nghe',
+    description: 'Bí quyết cân bằng giữa nghiên cứu khoa học, hoạt động phong trào và săn học bổng du học.',
+  },
+  {
+    id: 'media-3',
+    title: 'Album Ảnh: Sắc màu rực rỡ Dạ hội Chào tân sinh viên Phenikaa 2026',
+    type: 'album',
+    duration: '48 ảnh',
+    cover: 'https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?auto=format&fit=crop&w=600&q=80',
+    views: '6.2K xem',
+    description: 'Bộ sưu tập những khoảnh khắc đẹp lung linh của thầy cô và các bạn sinh viên.',
   },
 ];
