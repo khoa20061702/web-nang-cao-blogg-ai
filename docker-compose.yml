@@ -1,0 +1,29 @@
+services:
+  app:
+    build: .
+    container_name: phenikaa-news-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongo:27017/phenikaa_news
+      - JWT_SECRET=phenikaa_super_secret_jwt_key_2026
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    depends_on:
+      - mongo
+
+  mongo:
+    image: mongo:7.0
+    container_name: phenikaa-news-mongo
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=phenikaa_news
+
+volumes:
+  mongo_data:

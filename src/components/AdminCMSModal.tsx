@@ -17,6 +17,8 @@ import {
   Upload,
 } from 'lucide-react';
 import { BlogPost, CategoryType } from '../types/blog.ts';
+import { UserProfile } from './AuthModal.tsx';
+import { AlertTriangle, Lock } from 'lucide-react';
 
 interface AdminCMSModalProps {
   isOpen: boolean;
@@ -25,6 +27,8 @@ interface AdminCMSModalProps {
   onAddPost: (newPost: BlogPost) => void;
   onDeletePost: (postId: string) => void;
   onSummarizeText: (text: string) => Promise<string>;
+  currentUser?: UserProfile | null;
+  onOpenAuth?: () => void;
 }
 
 const PRESET_COVERS = [
@@ -41,6 +45,8 @@ export const AdminCMSModal: React.FC<AdminCMSModalProps> = ({
   onAddPost,
   onDeletePost,
   onSummarizeText,
+  currentUser,
+  onOpenAuth,
 }) => {
   const [activeTab, setActiveTab] = useState<'create' | 'list'>('create');
 
@@ -179,6 +185,54 @@ export const AdminCMSModal: React.FC<AdminCMSModalProps> = ({
 
         {/* Modal Content */}
         <div className="p-6 overflow-y-auto space-y-6">
+          {/* Auth Banner for Rubric Demo */}
+          {!currentUser ? (
+            <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-xs flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                <span>
+                  <strong>Chưa đăng nhập:</strong> Bạn đang ở chế độ xem. Vui lòng đăng nhập tài khoản <strong>Admin</strong> hoặc <strong>Editor</strong> để ghi dữ liệu thật vào MongoDB.
+                </span>
+              </div>
+              {onOpenAuth && (
+                <button
+                  type="button"
+                  onClick={onOpenAuth}
+                  className="px-3 py-1 bg-[#00529C] hover:bg-[#003d75] text-white font-bold rounded-lg shrink-0 transition-colors shadow-2xs"
+                >
+                  Đăng Nhập Ngay
+                </button>
+              )}
+            </div>
+          ) : currentUser.role === 'student' ? (
+            <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-300 text-rose-800 text-xs flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <Lock className="w-4 h-4 text-rose-600 shrink-0" />
+                <span>
+                  <strong>Phân quyền Sinh Viên:</strong> Bạn đang đăng nhập với quyền <code>student</code>. Khi gửi bài viết, server Express sẽ trả về lỗi <code>403 Forbidden</code> (dùng để demo tiêu chí xử lý phân quyền của thầy).
+                </span>
+              </div>
+              {onOpenAuth && (
+                <button
+                  type="button"
+                  onClick={onOpenAuth}
+                  className="px-3 py-1 bg-[#ff6b00] hover:bg-[#e05e00] text-white font-bold rounded-lg shrink-0 transition-colors shadow-2xs"
+                >
+                  Đổi Tài Khoản Admin
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-800 text-xs flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>
+                  Đang đăng nhập với tư cách: <strong>{currentUser.fullName}</strong> ({currentUser.role === 'admin' ? '👑 Quản Trị Viên' : '✍️ Biên Tập Viên'}). Dữ liệu được đồng bộ trực tiếp với MongoDB.
+                </span>
+              </div>
+            </div>
+          )}
+
           {successMessage && (
             <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm font-medium flex items-center gap-2 animate-in fade-in">
               <CheckCircle2 className="w-4 h-4 text-emerald-600" />

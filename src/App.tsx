@@ -4,17 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import {
-  Sparkles,
-  ArrowRight,
-  Filter,
-  Layers,
-  X,
-  FileCode,
-  PenTool,
-  CheckCircle2,
-  AlertCircle,
-} from 'lucide-react';
+import { X } from 'lucide-react';
 import { TopBar } from './components/TopBar.tsx';
 import { Header } from './components/Header.tsx';
 import { Navbar } from './components/Navbar.tsx';
@@ -23,17 +13,13 @@ import { EntertainmentSection } from './components/EntertainmentSection.tsx';
 import { NewsTechList } from './components/NewsTechList.tsx';
 import { Sidebar247 } from './components/Sidebar247.tsx';
 import { AdminCMSModal } from './components/AdminCMSModal.tsx';
-import { StudentVoiceModal } from './components/StudentVoiceModal.tsx';
-import { FullArticleModal } from './components/FullArticleModal.tsx';
-import { SummaryResultModal } from './components/SummaryResultModal.tsx';
-import { CustomSummarizer } from './components/CustomSummarizer.tsx';
-import { CodeGuideView } from './components/CodeGuideView.tsx';
+import { ArticleDetailPage } from './components/ArticleDetailPage.tsx';
 import { Footer } from './components/Footer.tsx';
+import { AuthModal, UserProfile } from './components/AuthModal.tsx';
 import {
   INITIAL_POSTS,
   TIMELINE_NEWS,
   TRENDING_POSTS,
-  MULTIMEDIA_ITEMS,
 } from './data/mockPosts.ts';
 import {
   BlogPost,
@@ -41,7 +27,6 @@ import {
   SummaryData,
   CommentItem,
   TimelineNewsItem,
-  MultimediaItem,
 } from './types/blog.ts';
 
 export default function App() {
@@ -49,24 +34,102 @@ export default function App() {
   const [activeCategory, setActiveCategory] = useState<CategoryType | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Modals state
+  // Authentication State
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(() => {
+    try {
+      const saved = localStorage.getItem('phenikaa_auth_user');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+  const [authToken, setAuthToken] = useState<string | null>(() => {
+    return localStorage.getItem('phenikaa_auth_token') || null;
+  });
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+
+  // Modals state - chỉ mở CMS cho Admin
   const [isCMSOpen, setIsCMSOpen] = useState(false);
-  const [isStudentVoiceOpen, setIsStudentVoiceOpen] = useState(false);
-  const [isCodeGuideOpen, setIsCodeGuideOpen] = useState(false);
-  const [isAISandboxOpen, setIsAISandboxOpen] = useState(false);
+
+  // Load real posts from MongoDB on initial mount
+  useEffect(() => {
+    const fetchMongoPosts = async () => {
+      try {
+        const res = await fetch('/api/posts');
+        const json = await res.json();
+        if (res.ok && json.success && Array.isArray(json.data) && json.data.length > 0) {
+          setPosts(json.data);
+          console.log(`[Frontend] Đã tải ${json.data.length} bài viết từ MongoDB.`);
+        }
+      } catch (err) {
+        console.warn('[Frontend] Chưa thể kết nối tới MongoDB, sử dụng mock posts làm fallback:', err);
+      }
+    };
+    fetchMongoPosts();
+  }, []);
+
+  const handleLoginSuccess = (user: UserProfile, token: string) => {
+    setCurrentUser(user);
+    setAuthToken(token);
+    localStorage.setItem('phenikaa_auth_user', JSON.stringify(user));
+    localStorage.setItem('phenikaa_auth_token', token);
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    setAuthToken(null);
+    localStorage.removeItem('phenikaa_auth_user');
+    localStorage.removeItem('phenikaa_auth_token');
+    alert('Đã đăng xuất tài khoản.');
+  };
 
   // Article reading & Summarization state
   const [readingPost, setReadingPost] = useState<BlogPost | null>(null);
   const [summarizingPostId, setSummarizingPostId] = useState<string | null>(null);
-  const [activeSummary, setActiveSummary] = useState<SummaryData | null>(null);
-  const [activeSummaryTitle, setActiveSummaryTitle] = useState<string | undefined>();
-  const [lastRequestPayload, setLastRequestPayload] = useState<any>(null);
-  const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false);
   const [summaryCache, setSummaryCache] = useState<Record<string, SummaryData>>({});
 
-  // Timeline & Media
+  // SYNC URL ROUTING: Quản lý URL /post/:id và quay lại /
+  useEffect(() => {
+    const syncRouteWithState = async () => {
+      const pathname = window.location.pathname;
+      if (pathname.startsWith('/post/')) {
+        const postId = pathname.replace('/post/', '').trim();
+        if (postId) {
+          // 1. Tìm trong danh sách posts hiện tại
+          const found = posts.find((p) => p.id === postId || (p as any)._id === postId);
+          if (found) {
+            setReadingPost(found);
+            return;
+          }
+
+          // 2. Nếu chưa có trong state (ví dụ F5 tải lại trực tiếp từ URL /post/:id), fetch từ API
+          try {
+            const res = await fetch(`/api/posts/${postId}`);
+            const json = await res.json();
+            if (res.ok && json.success && json.data) {
+              setReadingPost(json.data);
+            }
+          } catch (err) {
+            console.warn('[Routing] Lỗi khi tải bài viết từ URL:', err);
+          }
+        }
+      } else {
+        setReadingPost(null);
+      }
+    };
+
+    syncRouteWithState();
+
+    const handlePopState = () => {
+      syncRouteWithState();
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [posts]);
+
+  // Timeline
   const [timelineNews, setTimelineNews] = useState<TimelineNewsItem[]>(TIMELINE_NEWS);
-  const [multimediaItems, setMultimediaItems] = useState<MultimediaItem[]>(MULTIMEDIA_ITEMS);
 
   // Filter posts based on category and search query
   const filteredPosts = posts.filter((post) => {
@@ -87,18 +150,9 @@ export default function App() {
     (p) => p.category === 'Công Nghệ & Đổi Mới' || p.category === 'Tin Phenikaa'
   );
 
-  // Handle summarize for any blog post
+  // Handle summarize for any blog post (HIỂN THỊ INLINE NGAY TRÊN TRANG, KHÔNG MỞ POPUP)
   const handleSummarizePost = async (post: BlogPost) => {
     if (summaryCache[post.id]) {
-      setActiveSummary(summaryCache[post.id]);
-      setActiveSummaryTitle(post.title);
-      setLastRequestPayload({
-        title: post.title,
-        contentLength: post.content.length,
-        bulletsCount: 3,
-        cached: true,
-      });
-      setIsSummaryModalOpen(true);
       return;
     }
 
@@ -111,7 +165,6 @@ export default function App() {
         tone: 'engaging',
         language: 'vi',
       };
-      setLastRequestPayload(payload);
 
       const response = await fetch('/api/ai/summarize', {
         method: 'POST',
@@ -126,11 +179,8 @@ export default function App() {
 
       const summaryData = result.data as SummaryData;
       setSummaryCache((prev) => ({ ...prev, [post.id]: summaryData }));
-      setActiveSummary(summaryData);
-      setActiveSummaryTitle(post.title);
-      setIsSummaryModalOpen(true);
     } catch (err: any) {
-      alert(`Không thể tạo tóm tắt: ${err.message || 'Lỗi kết nối'}`);
+      alert(`Không thể tạo tóm tắt AI: ${err.message || 'Lỗi kết nối'}`);
     } finally {
       setSummarizingPostId(null);
     }
@@ -150,245 +200,310 @@ export default function App() {
     return text.slice(0, 150) + '...';
   };
 
-  // Handle Add Post from CMS
-  const handleAddPost = (newPost: BlogPost) => {
-    setPosts((prev) => [newPost, ...prev]);
+  // Handle Add Post to MongoDB
+  const handleAddPost = async (newPost: BlogPost) => {
+    try {
+      const response = await fetch('/api/posts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+        },
+        body: JSON.stringify(newPost),
+      });
 
-    // Also push to timeline
-    const now = new Date();
-    const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-    const newTimelineItem: TimelineNewsItem = {
-      id: `tl-${Date.now()}`,
-      time: timeStr,
-      title: newPost.title,
-      category: newPost.category,
-      badge: 'MỚI ĐĂNG',
-    };
-    setTimelineNews((prev) => [newTimelineItem, ...prev]);
-  };
+      const result = await response.json();
 
-  // Handle Delete Post
-  const handleDeletePost = (postId: string) => {
-    setPosts((prev) => prev.filter((p) => p.id !== postId));
-  };
+      if (!response.ok || !result.success) {
+        alert(`[Lỗi ${response.status} ${result.code || ''}]: ${result.error || 'Không thể tạo bài viết.'}`);
+        return;
+      }
 
-  // Handle Add Comment
-  const handleAddComment = (postId: string, comment: CommentItem) => {
-    setPosts((prev) =>
-      prev.map((p) => (p.id === postId ? { ...p, comments: [comment, ...p.comments] } : p))
-    );
-    if (readingPost && readingPost.id === postId) {
-      setReadingPost((prev) =>
-        prev ? { ...prev, comments: [comment, ...prev.comments] } : null
-      );
+      const createdPost = result.data;
+      setPosts((prev) => [createdPost, ...prev]);
+
+      const now = new Date();
+      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+      const newTimelineItem: TimelineNewsItem = {
+        id: `tl-${Date.now()}`,
+        time: timeStr,
+        title: createdPost.title,
+        category: createdPost.category,
+        badge: 'MỚI ĐĂNG',
+      };
+      setTimelineNews((prev) => [newTimelineItem, ...prev]);
+      alert('✅ Đã lưu bài viết thành công vào MongoDB!');
+    } catch (err: any) {
+      alert('Lỗi kết nối khi gửi bài: ' + err.message);
     }
   };
 
-  // Handle Reaction Click
+  // Handle Delete Post from MongoDB
+  const handleDeletePost = async (postId: string) => {
+    if (!confirm('Bạn có chắc chắn muốn xóa bài viết này khỏi MongoDB?')) return;
+    try {
+      const response = await fetch(`/api/posts/${postId}`, {
+        method: 'DELETE',
+        headers: { ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}) },
+      });
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        alert(`[Lỗi ${response.status} ${result.code || ''}]: ${result.error}`);
+        return;
+      }
+      setPosts((prev) => prev.filter((p) => p.id !== postId && (p as any)._id !== postId));
+      if (readingPost && (readingPost.id === postId || (readingPost as any)._id === postId)) {
+        setReadingPost(null);
+      }
+      alert('✅ Đã xóa bài viết khỏi MongoDB!');
+    } catch (err: any) {
+      alert('Lỗi xóa bài: ' + err.message);
+    }
+  };
+
+  // Handle Add Comment to MongoDB
+  const handleAddComment = async (postId: string, comment: CommentItem) => {
+    try {
+      const response = await fetch(`/api/posts/${postId}/comments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userName: currentUser ? currentUser.fullName : (comment.userName || comment.author || 'Độc giả ẩn danh'),
+          userRole: currentUser
+            ? (currentUser.role === 'admin' ? 'Ban Quản Trị' : 'Độc Giả Phenikaa')
+            : (comment.role || 'Độc Giả Phenikaa'),
+          content: comment.text || (comment as any).content,
+        }),
+      });
+      const result = await response.json();
+      if (response.ok && result.success) {
+        const saved = result.data;
+        const mappedComment: CommentItem = {
+          id: saved.id || `c-${Date.now()}`,
+          author: saved.userName,
+          role: saved.userRole,
+          text: saved.content,
+          createdAt: 'Vừa xong',
+          likes: 0,
+        };
+        setPosts((prev) =>
+          prev.map((p) =>
+            p.id === postId || (p as any)._id === postId
+              ? { ...p, comments: [mappedComment, ...(p.comments || [])] } : p
+          )
+        );
+        if (readingPost && (readingPost.id === postId || (readingPost as any)._id === postId)) {
+          setReadingPost((prev) => prev ? { ...prev, comments: [mappedComment, ...(prev.comments || [])] } : null);
+        }
+        return;
+      }
+    } catch (err) {
+      console.warn('Comment sync failed, local update:', err);
+    }
+
+    setPosts((prev) =>
+      prev.map((p) =>
+        p.id === postId || (p as any)._id === postId
+          ? { ...p, comments: [comment, ...(p.comments || [])] } : p
+      )
+    );
+    if (readingPost && (readingPost.id === postId || (readingPost as any)._id === postId)) {
+      setReadingPost((prev) => prev ? { ...prev, comments: [comment, ...(prev.comments || [])] } : null);
+    }
+  };
+
+  // Handle Reaction Click (optimistic + background MongoDB sync)
   const handleReact = (postId: string, reactionType: 'like' | 'heart' | 'haha' | 'wow' | 'sad') => {
+    fetch(`/api/posts/${postId}/reactions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type: reactionType }),
+    }).catch((e) => console.warn('Sync reaction failed:', e));
+
     setPosts((prev) =>
       prev.map((p) => {
-        if (p.id === postId) {
+        if (p.id === postId || (p as any)._id === postId) {
           return {
             ...p,
-            reactions: {
-              ...p.reactions,
-              [reactionType]: p.reactions[reactionType] + 1,
-            },
+            reactions: { ...p.reactions, [reactionType]: ((p.reactions?.[reactionType]) || 0) + 1 },
           };
         }
         return p;
       })
     );
-
-    if (readingPost && readingPost.id === postId) {
+    if (readingPost && (readingPost.id === postId || (readingPost as any)._id === postId)) {
       setReadingPost((prev) =>
         prev
-          ? {
-              ...prev,
-              reactions: {
-                ...prev.reactions,
-                [reactionType]: prev.reactions[reactionType] + 1,
-              },
-            }
+          ? { ...prev, reactions: { ...prev.reactions, [reactionType]: ((prev.reactions?.[reactionType]) || 0) + 1 } }
           : null
       );
     }
   };
 
-  // Handle Student Voice submission
-  const handleSubmitStudentIdea = (data: {
-    studentName: string;
-    studentId: string;
-    faculty: string;
-    topic: string;
-    content: string;
-  }) => {
-    const newPost: BlogPost = {
-      id: `post-student-${Date.now()}`,
-      title: `[Hiến Kế Sinh Viên] ${data.topic}`,
-      category: 'Góc Sinh Viên',
-      author: data.studentName,
-      authorRole: `${data.faculty} (MSSV: ${data.studentId || 'N/A'})`,
-      publishedAt: 'Vừa xong',
-      readTime: '3 phút đọc',
-      excerpt: data.content.slice(0, 160) + '...',
-      coverImage: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=600&q=80',
-      content: data.content,
-      tags: ['Hiến Kế', 'Góc Sinh Viên', 'Phenikaa Campus'],
-      viewsCount: 1,
-      reactions: { like: 1, heart: 1, haha: 0, wow: 0, sad: 0 },
-      comments: [],
-    };
-    setPosts((prev) => [newPost, ...prev]);
+  const handleOpenPost = (post: BlogPost) => {
+    setReadingPost(post);
+    const targetId = post.id || (post as any)._id;
+    if (window.location.pathname !== `/post/${targetId}`) {
+      window.history.pushState(null, '', `/post/${targetId}`);
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  const handleBackToHome = () => {
+    setReadingPost(null);
+    if (window.location.pathname !== '/') {
+      window.history.pushState(null, '', '/');
+    }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  // CHỈ ADMIN MỚI ĐƯỢC THẤY NÚT ĐĂNG BÀI & QUẢN TRỊ CMS
+  const isAdmin = currentUser?.role === 'admin';
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-900 flex flex-col font-sans selection:bg-[#ff6b00] selection:text-white">
       {/* 1. TOP BAR */}
       <TopBar
         onOpenCMS={() => setIsCMSOpen(true)}
-        onOpenStudentVoice={() => setIsStudentVoiceOpen(true)}
-        onOpenCodeGuide={() => setIsCodeGuideOpen(true)}
+        currentUser={currentUser}
+        onOpenAuth={() => setIsAuthOpen(true)}
+        onLogout={handleLogout}
       />
 
       {/* 2. HEADER */}
       <Header
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
-        onOpenAICustom={() => setIsAISandboxOpen(true)}
       />
 
       {/* 3. STICKY PHENIKAA NAVIGATION MENU */}
       <Navbar
         activeCategory={activeCategory}
-        setActiveCategory={setActiveCategory}
+        setActiveCategory={(cat) => {
+          setActiveCategory(cat);
+          if (readingPost) {
+            handleBackToHome();
+          }
+        }}
         onOpenCMS={() => setIsCMSOpen(true)}
-        onOpenAICustom={() => setIsAISandboxOpen(true)}
-        onOpenCodeGuide={() => setIsCodeGuideOpen(true)}
+        canManageCMS={isAdmin}
       />
 
-      {/* 4. MAIN CONTENT AREA (LƯỚI 3 CỘT: 2/3 NỘI DUNG CHÍNH + 1/3 SIDEBAR) */}
-      <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full">
-        {/* Category Filter Banner (if a specific category is selected) */}
-        {activeCategory !== 'all' && (
-          <div className="mb-6 p-4 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="w-3 h-6 bg-[#ff6b00] rounded-sm"></span>
-              <h2 className="font-serif font-black text-xl text-[#003366]">
-                Chuyên mục: {activeCategory}
-              </h2>
-              <span className="text-xs bg-slate-100 px-2 py-0.5 rounded text-slate-600 font-medium">
-                {filteredPosts.length} bài viết
-              </span>
-            </div>
-            <button
-              onClick={() => setActiveCategory('all')}
-              className="text-xs font-semibold text-[#00529C] hover:text-[#ff6b00] flex items-center gap-1"
-            >
-              <span>Xem tất cả chuyên mục</span>
-              <X className="w-3.5 h-3.5" />
-            </button>
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* CỘT TRÁI & TRUNG TÂM (CHIẾM 2/3 CHIỀU RỘNG - 8 CỘT) */}
-          <div className="lg:col-span-8 space-y-8">
-            {/* If Trang Chủ ('all'): Display Hot News -> Entertainment -> News Tech */}
-            {activeCategory === 'all' && (
-              <>
-                {/* A. Khối Tiêu Điểm / Nổi Bật (Hot News) */}
-                <FeaturedHotNews
-                  mainFeatured={mainFeatured}
-                  subFeaturedList={subFeatured}
-                  onReadPost={(p) => setReadingPost(p)}
-                  onSummarizePost={handleSummarizePost}
-                  summarizingPostId={summarizingPostId}
-                  summaryCache={summaryCache}
-                />
-
-                {/* B. Khối Chuyên Mục "Giải Trí Phenikaa" (Card View) */}
-                <EntertainmentSection
-                  posts={entertainmentPosts.slice(0, 3)}
-                  onReadPost={(p) => setReadingPost(p)}
-                  onSummarizePost={handleSummarizePost}
-                />
-
-                {/* C. Khối Chuyên Mục "Tin Tức & Công Nghệ" (Media List View) */}
-                <NewsTechList
-                  posts={techPosts.slice(0, 4)}
-                  onReadPost={(p) => setReadingPost(p)}
-                  onSummarizePost={handleSummarizePost}
-                />
-              </>
-            )}
-
-            {/* If Specific Category Selected: Display Filtered Grid */}
-            {activeCategory !== 'all' && (
-              <div className="space-y-4">
-                {filteredPosts.length === 0 ? (
-                  <div className="p-12 text-center bg-white rounded-2xl border border-slate-200">
-                    <p className="text-slate-500 font-medium">
-                      Chưa có bài viết nào trong chuyên mục này.
-                    </p>
-                  </div>
-                ) : (
-                  <NewsTechList
-                    posts={filteredPosts}
-                    onReadPost={(p) => setReadingPost(p)}
-                    onSummarizePost={handleSummarizePost}
-                  />
-                )}
+      {/* 4. MAIN CONTENT AREA: CHUYỂN ĐỔI GIỮA TRANG CHI TIẾT BÀI BÁO VÀ TRANG CHỦ */}
+      {readingPost ? (
+        /* TRANG CHI TIẾT BÀI BÁO (DEDICATED FULL PAGE VIEW) */
+        <ArticleDetailPage
+          post={readingPost}
+          onBackToHome={handleBackToHome}
+          onSelectPost={handleOpenPost}
+          relatedPosts={posts.filter((p) => p.category === readingPost.category && p.id !== readingPost.id)}
+          summaryData={summaryCache[readingPost.id]}
+          isSummarizing={summarizingPostId === readingPost.id}
+          onSummarize={handleSummarizePost}
+          onAddComment={handleAddComment}
+          onReact={handleReact}
+          currentUser={currentUser}
+          onOpenAuth={() => setIsAuthOpen(true)}
+        />
+      ) : (
+        /* TRANG CHỦ DANH SÁCH BÀI BÁO (LƯỚI 3 CỘT: 2/3 NỘI DUNG CHÍNH + 1/3 SIDEBAR) */
+        <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full">
+          {/* Category Filter Banner (if a specific category is selected) */}
+          {activeCategory !== 'all' && (
+            <div className="mb-6 p-4 rounded-xl bg-white border border-slate-200 shadow-sm flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-6 bg-[#ff6b00] rounded-sm"></span>
+                <h2 className="font-serif font-black text-xl text-[#003366]">
+                  Chuyên mục: {activeCategory}
+                </h2>
+                <span className="text-xs bg-slate-100 px-2 py-0.5 rounded text-slate-600 font-medium">
+                  {filteredPosts.length} bài viết
+                </span>
               </div>
-            )}
-          </div>
+              <button
+                onClick={() => setActiveCategory('all')}
+                className="text-xs font-semibold text-[#00529C] hover:text-[#ff6b00] flex items-center gap-1 cursor-pointer"
+              >
+                <span>Xem tất cả chuyên mục</span>
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
 
-          {/* CỘT PHẢI - SIDEBAR (CHIẾM 1/3 CHIỀU RỘNG - 4 CỘT) */}
-          <div className="lg:col-span-4">
-            <Sidebar247
-              timelineNews={timelineNews}
-              trendingList={TRENDING_POSTS}
-              multimediaItems={multimediaItems}
-              onSelectPostById={(id) => {
-                const found = posts.find((p) => p.id === id);
-                if (found) setReadingPost(found);
-              }}
-              onOpenCodeGuide={() => setIsCodeGuideOpen(true)}
-            />
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            {/* CỘT TRÁI & TRUNG TÂM (CHIẾM 2/3 CHIỀU RỘNG - 8 CỘT) */}
+            <div className="lg:col-span-8 space-y-8">
+              {/* If Trang Chủ ('all'): Display Hot News -> Entertainment -> News Tech */}
+              {activeCategory === 'all' && (
+                <>
+                  {/* A. Khối Tiêu Điểm / Nổi Bật (Hot News) */}
+                  <FeaturedHotNews
+                    mainFeatured={mainFeatured}
+                    subFeaturedList={subFeatured}
+                    onReadPost={handleOpenPost}
+                    onSummarizePost={handleOpenPost}
+                    summarizingPostId={summarizingPostId}
+                    summaryCache={summaryCache}
+                  />
+
+                  {/* B. Khối Chuyên Mục "Giải Trí Phenikaa" (Card View) */}
+                  <EntertainmentSection
+                    posts={entertainmentPosts.slice(0, 3)}
+                    onReadPost={handleOpenPost}
+                    onSummarizePost={handleOpenPost}
+                  />
+
+                  {/* C. Khối Chuyên Mục "Tin Tức & Công Nghệ" (Media List View) */}
+                  <NewsTechList
+                    posts={techPosts.slice(0, 4)}
+                    onReadPost={handleOpenPost}
+                    onSummarizePost={handleOpenPost}
+                  />
+                </>
+              )}
+
+              {/* If Specific Category Selected: Display Filtered Grid */}
+              {activeCategory !== 'all' && (
+                <div className="space-y-4">
+                  {filteredPosts.length === 0 ? (
+                    <div className="p-12 text-center bg-white rounded-2xl border border-slate-200">
+                      <p className="text-slate-500 font-medium">
+                        Chưa có bài viết nào trong chuyên mục này.
+                      </p>
+                    </div>
+                  ) : (
+                    <NewsTechList
+                      posts={filteredPosts}
+                      onReadPost={handleOpenPost}
+                      onSummarizePost={handleOpenPost}
+                    />
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* CỘT PHẢI - SIDEBAR (CHIẾM 1/3 CHIỀU RỘNG - 4 CỘT) */}
+            <div className="lg:col-span-4">
+              <Sidebar247
+                timelineNews={timelineNews}
+                trendingList={TRENDING_POSTS}
+                onSelectPostById={(id) => {
+                  const found = posts.find((p) => p.id === id);
+                  if (found) handleOpenPost(found);
+                }}
+              />
+            </div>
           </div>
-        </div>
-      </main>
+        </main>
+      )}
 
       {/* 5. FOOTER */}
       <Footer
-        onOpenCodeGuide={() => setIsCodeGuideOpen(true)}
-        onOpenStudentVoice={() => setIsStudentVoiceOpen(true)}
         onOpenCMS={() => setIsCMSOpen(true)}
+        isAdmin={isAdmin}
       />
 
-      {/* MODAL 1: Full Article Reader with Comments & Reactions */}
-      <FullArticleModal
-        post={readingPost}
-        onClose={() => setReadingPost(null)}
-        onSummarize={(post) => {
-          handleSummarizePost(post);
-        }}
-        isSummarizing={summarizingPostId === readingPost?.id}
-        onAddComment={handleAddComment}
-        onReact={handleReact}
-      />
-
-      {/* MODAL 2: AI Summary Result with 3 Bullets & JSON Inspector */}
-      <SummaryResultModal
-        isOpen={isSummaryModalOpen}
-        onClose={() => setIsSummaryModalOpen(false)}
-        summary={activeSummary}
-        articleTitle={activeSummaryTitle}
-        requestPayload={lastRequestPayload}
-      />
-
-      {/* MODAL 3: Admin CMS Panel */}
+      {/* MODAL 1: Admin CMS Panel - CHỈ DÀNH CHO ADMIN */}
       <AdminCMSModal
         isOpen={isCMSOpen}
         onClose={() => setIsCMSOpen(false)}
@@ -396,80 +511,16 @@ export default function App() {
         onAddPost={handleAddPost}
         onDeletePost={handleDeletePost}
         onSummarizeText={handleSummarizeTextOnly}
+        currentUser={currentUser}
+        onOpenAuth={() => setIsAuthOpen(true)}
       />
 
-      {/* MODAL 4: Student Voice / Hiến Kế */}
-      <StudentVoiceModal
-        isOpen={isStudentVoiceOpen}
-        onClose={() => setIsStudentVoiceOpen(false)}
-        onSubmitIdea={handleSubmitStudentIdea}
+      {/* MODAL 2: Authentication - Đăng nhập / Đăng ký */}
+      <AuthModal
+        isOpen={isAuthOpen}
+        onClose={() => setIsAuthOpen(false)}
+        onLoginSuccess={handleLoginSuccess}
       />
-
-      {/* MODAL 5: Custom AI Summarizer Sandbox */}
-      {isAISandboxOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/70 backdrop-blur-sm overflow-y-auto">
-          <div className="relative w-full max-w-4xl bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 text-white my-auto max-h-[92vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-4">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-amber-400" />
-                <h3 className="font-serif font-bold text-lg text-white">
-                  Studio Tóm Tắt Tự Do (AI Sandbox)
-                </h3>
-              </div>
-              <button
-                onClick={() => setIsAISandboxOpen(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-white"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <CustomSummarizer
-              onSummarizeCustom={async (params) => {
-                setLastRequestPayload(params);
-                const res = await fetch('/api/ai/summarize', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(params),
-                });
-                const result = await res.json();
-                if (!res.ok || !result.success) {
-                  throw new Error(result.error || `HTTP error ${res.status}`);
-                }
-                setActiveSummary(result.data);
-                setActiveSummaryTitle(params.title || 'Bài viết tùy chỉnh');
-                setIsSummaryModalOpen(true);
-              }}
-              isLoading={false}
-              error={null}
-            />
-          </div>
-        </div>
-      )}
-
-      {/* MODAL 6: Full Node.js Express Code & Architecture Guide */}
-      {isCodeGuideOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/75 backdrop-blur-sm overflow-y-auto">
-          <div className="relative w-full max-w-5xl bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 text-white my-auto max-h-[92vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-800 mb-6">
-              <div className="flex items-center gap-2">
-                <FileCode className="w-5 h-5 text-amber-400" />
-                <h3 className="font-serif font-bold text-lg text-white">
-                  Tài Liệu & Mã Nguồn Node.js Express Chuẩn Đồ Án
-                </h3>
-              </div>
-              <button
-                onClick={() => setIsCodeGuideOpen(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-white"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <CodeGuideView />
-          </div>
-        </div>
-      )}
     </div>
   );
 }

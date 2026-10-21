@@ -5,13 +5,10 @@ import {
   Film,
   Trophy,
   Lightbulb,
-  Radio,
   PenTool,
   PlusCircle,
   Menu,
   X,
-  Sparkles,
-  Code2,
 } from 'lucide-react';
 import { CategoryType } from '../types/blog.ts';
 
@@ -19,16 +16,14 @@ interface NavbarProps {
   activeCategory: CategoryType | 'all';
   setActiveCategory: (category: CategoryType | 'all') => void;
   onOpenCMS: () => void;
-  onOpenAICustom: () => void;
-  onOpenCodeGuide: () => void;
+  canManageCMS?: boolean;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   activeCategory,
   setActiveCategory,
   onOpenCMS,
-  onOpenAICustom,
-  onOpenCodeGuide,
+  canManageCMS = false,
 }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -38,7 +33,6 @@ export const Navbar: React.FC<NavbarProps> = ({
     { label: 'Giải Trí & Đời Sống', category: 'Giải Trí & Đời Sống', icon: Film },
     { label: 'Thể Thao & Bứt Phá', category: 'Thể Thao & Bứt Phá', icon: Trophy },
     { label: 'Công Nghệ & Đổi Mới', category: 'Công Nghệ & Đổi Mới', icon: Lightbulb },
-    { label: 'Multimedia', category: 'Multimedia', icon: Radio },
     { label: 'Góc Sinh Viên', category: 'Góc Sinh Viên', icon: PenTool },
   ];
 
@@ -49,18 +43,15 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="flex items-center lg:hidden">
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-1.5 rounded-lg text-white hover:bg-[#004080] transition-colors focus:outline-none"
-            aria-label="Toggle menu"
+            className="p-1.5 rounded-md hover:bg-[#004080] text-slate-100 transition-colors"
+            aria-label="Mở menu điều hướng"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
-          <span className="font-serif font-bold text-sm ml-2 text-white">
-            PHENIKAA MENU
-          </span>
         </div>
 
-        {/* Desktop Navigation Links */}
-        <div className="hidden lg:flex items-center space-x-1 overflow-x-auto no-scrollbar">
+        {/* Desktop Category Navigation */}
+        <div className="hidden lg:flex items-center gap-1 overflow-x-auto py-1 scrollbar-none">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeCategory === item.category;
@@ -70,7 +61,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 onClick={() => {
                   setActiveCategory(item.category);
                 }}
-                className={`flex items-center gap-1.5 px-3 py-2 text-xs xl:text-sm font-semibold rounded-md transition-all whitespace-nowrap ${
+                className={`flex items-center gap-1.5 px-3 py-2 text-xs xl:text-sm font-semibold rounded-md transition-all whitespace-nowrap cursor-pointer ${
                   isActive
                     ? 'bg-[#ff6b00] text-white shadow-inner font-bold'
                     : 'text-slate-100 hover:bg-[#004080] hover:text-white'
@@ -83,25 +74,18 @@ export const Navbar: React.FC<NavbarProps> = ({
           })}
         </div>
 
-        {/* Right Action Buttons */}
+        {/* Right Action Button: Đăng bài CMS - CHỈ ADMIN MỚI THẤY */}
         <div className="flex items-center gap-2">
-          <button
-            onClick={onOpenAICustom}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded text-xs font-semibold bg-[#ff6b00] hover:bg-[#e05e00] text-white transition-all shadow-sm"
-            title="Mở Studio tóm tắt văn bản bằng AI"
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">AI Studio</span>
-          </button>
-
-          <button
-            onClick={onOpenCMS}
-            className="flex items-center gap-1 px-2.5 py-1.5 rounded text-xs font-semibold bg-white text-[#00529C] hover:bg-slate-100 transition-all shadow-sm"
-            title="Đăng bài viết mới & Quản lý nội dung"
-          >
-            <PlusCircle className="w-3.5 h-3.5 text-[#ff6b00]" />
-            <span className="hidden sm:inline">Đăng Bài (CMS)</span>
-          </button>
+          {canManageCMS && (
+            <button
+              onClick={onOpenCMS}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold bg-white text-[#00529C] hover:bg-slate-100 transition-all shadow-sm cursor-pointer"
+              title="Đăng bài viết mới & Quản lý nội dung (Dành riêng cho Admin)"
+            >
+              <PlusCircle className="w-3.5 h-3.5 text-[#ff6b00]" />
+              <span className="hidden sm:inline">Đăng Bài (Admin)</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -118,7 +102,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   setActiveCategory(item.category);
                   setMobileMenuOpen(false);
                 }}
-                className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium rounded-lg text-left transition-colors ${
+                className={`w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium rounded-lg text-left transition-colors cursor-pointer ${
                   isActive
                     ? 'bg-[#ff6b00] text-white font-bold'
                     : 'text-slate-200 hover:bg-[#00488a] hover:text-white'
@@ -130,29 +114,20 @@ export const Navbar: React.FC<NavbarProps> = ({
             );
           })}
 
-          <div className="pt-2 border-t border-[#00488a] flex flex-col gap-2">
-            <button
-              onClick={() => {
-                onOpenAICustom();
-                setMobileMenuOpen(false);
-              }}
-              className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold rounded-lg bg-gradient-to-r from-amber-500 to-orange-500 text-white"
-            >
-              <Sparkles className="w-4 h-4" />
-              <span>Studio Tóm Tắt Tự Do (AI Sandbox)</span>
-            </button>
-
-            <button
-              onClick={() => {
-                onOpenCodeGuide();
-                setMobileMenuOpen(false);
-              }}
-              className="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium rounded-lg bg-[#00284d] text-amber-300"
-            >
-              <Code2 className="w-4 h-4" />
-              <span>Xem Mã Nguồn Node.js Express</span>
-            </button>
-          </div>
+          {canManageCMS && (
+            <div className="pt-2 border-t border-[#00488a]">
+              <button
+                onClick={() => {
+                  onOpenCMS();
+                  setMobileMenuOpen(false);
+                }}
+                className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-bold rounded-lg bg-[#ff6b00] text-white"
+              >
+                <PlusCircle className="w-4 h-4" />
+                <span>Mở Bảng Quản Trị CMS (Admin)</span>
+              </button>
+            </div>
+          )}
         </div>
       )}
     </nav>

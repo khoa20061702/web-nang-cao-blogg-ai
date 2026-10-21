@@ -1,16 +1,14 @@
 import React from 'react';
-import { Search, Sun, CloudSun, CalendarDays, Bell, Sparkles } from 'lucide-react';
+import { Search, CloudSun, CalendarDays } from 'lucide-react';
 
 interface HeaderProps {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
-  onOpenAICustom: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   searchQuery,
   setSearchQuery,
-  onOpenAICustom,
 }) => {
   return (
     <header className="bg-white border-b border-slate-200 py-3.5 px-4">
@@ -61,26 +59,16 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Search Box */}
-          <div className="relative flex-1 md:w-64">
+          <div className="relative flex-1 md:w-72">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Tìm kiếm bài viết, CLB, sự kiện..."
+              placeholder="Tìm kiếm bài viết, tác giả, chuyên mục..."
               className="w-full pl-9 pr-3 py-2 text-xs rounded-xl bg-slate-50 border border-slate-200 text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#00529C] focus:bg-white transition-all shadow-inner"
             />
           </div>
-
-          {/* AI Summarize Quick CTA */}
-          <button
-            onClick={onOpenAICustom}
-            className="hidden sm:flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-sm transition-all shrink-0"
-            title="Thử nghiệm tóm tắt nội dung bất kỳ bằng Google Gemini API"
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>AI Summarizer</span>
-          </button>
         </div>
       </div>
     </header>
