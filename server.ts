@@ -271,8 +271,8 @@ async function startServer() {
     });
   }
 
-  // Only start listening if not running under a test runner like supertest
-  if (process.env.NODE_ENV !== 'test') {
+  // Only start listening if not running under a test runner or Vercel serverless environment
+  if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`[VietNews Server] 🚀 Đang chạy trên http://0.0.0.0:${PORT}`);
       console.log(`[VietNews Server] 🔑 Trạng thái Gemini API: ${apiKey ? 'Đã cấu hình' : 'Chưa có Key'}`);
@@ -280,7 +280,11 @@ async function startServer() {
   }
 }
 
-startServer().catch((err) => {
-  console.error('[VietNews Server] Lỗi khởi động:', err);
-  process.exit(1);
-});
+if (!process.env.VERCEL) {
+  startServer().catch((err) => {
+    console.error('[VietNews Server] Lỗi khởi động:', err);
+    process.exit(1);
+  });
+}
+
+export default app;
