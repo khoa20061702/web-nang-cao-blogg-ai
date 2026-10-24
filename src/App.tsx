@@ -327,7 +327,7 @@ export default function App() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userName: currentUser ? currentUser.fullName : (comment.userName || comment.author || 'Độc giả ẩn danh'),
+          userName: currentUser ? currentUser.fullName : ((comment as any).userName || comment.author || 'Độc giả ẩn danh'),
           userRole: currentUser
             ? (currentUser.role === 'admin' ? 'Ban Quản Trị' : 'Độc Giả Phenikaa')
             : (comment.role || 'Độc Giả Phenikaa'),

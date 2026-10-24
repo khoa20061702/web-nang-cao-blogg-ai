@@ -23,7 +23,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import { BlogPost, CommentItem } from '../types/blog.ts';
-import { SummaryData } from '../types/summary.ts';
+import { SummaryData } from '../types/blog.ts';
 import { UserProfile } from './AuthModal.tsx';
 
 interface ArticleDetailPageProps {
@@ -88,7 +88,7 @@ export const ArticleDetailPage: React.FC<ArticleDetailPageProps> = ({
 
   const handleCopySummary = () => {
     if (!summaryData) return;
-    const text = `【TÓM TẮT BÀI BÁO BỞI AI】\n${summaryData.headline}\n\nÝ chính:\n${summaryData.bulletPoints.map((b, i) => `${i + 1}. ${b}`).join('\n')}`;
+    const text = `【TÓM TẮT BÀI BÁO BỞI AI】\n${summaryData.headline}\n\nÝ chính:\n${summaryData.bulletPoints.map((b: string, i: number) => `${i + 1}. ${b}`).join('\n')}`;
     navigator.clipboard.writeText(text);
     setCopiedSummary(true);
     setTimeout(() => setCopiedSummary(false), 2000);
@@ -183,7 +183,7 @@ export const ArticleDetailPage: React.FC<ArticleDetailPageProps> = ({
               <span>•</span>
               <span className="flex items-center gap-1" title="Lượt xem bài viết">
                 <BookOpen className="w-3.5 h-3.5 text-slate-400" />
-                {Number(post.views ?? (post as any).viewsCount ?? 1250).toLocaleString('vi-VN')} lượt đọc
+                {Number((post.viewsCount ?? 1250)).toLocaleString('vi-VN')} lượt đọc
               </span>
               <span>•</span>
               <span className="flex items-center gap-1" title="Bình luận">
@@ -293,7 +293,7 @@ export const ArticleDetailPage: React.FC<ArticleDetailPageProps> = ({
                     3 Điểm cốt lõi độc giả cần biết:
                   </p>
                   <div className="space-y-2">
-                    {(summaryData.bulletPoints || []).map((point, idx) => (
+                    {(summaryData.bulletPoints || []).map((point: string, idx: number) => (
                       <div
                         key={idx}
                         className="flex items-start gap-3 bg-white/70 hover:bg-white p-3 rounded-xl border border-amber-200/60 transition-colors shadow-2xs"
@@ -313,11 +313,11 @@ export const ArticleDetailPage: React.FC<ArticleDetailPageProps> = ({
                 <div className="pt-2 flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500 border-t border-amber-200/60 font-mono">
                   <div className="flex items-center gap-3">
                     <span>
-                      Thời gian đọc tóm tắt: <strong className="text-amber-700">{summaryData.estimatedReadTime || '30 giây'}</strong>
+                      Thời gian đọc tóm tắt: <strong className="text-amber-700">{(summaryData as any).estimatedReadTime || (summaryData.metrics?.estimatedReadTimeSavedMin ? `${summaryData.metrics.estimatedReadTimeSavedMin} phút` : '30 giây')}</strong>
                     </span>
                     <span>•</span>
                     <span>
-                      Độ nén thông tin: <strong className="text-emerald-700">{summaryData.compressionRate || '78%'}</strong>
+                      Độ nén thông tin: <strong className="text-emerald-700">{(summaryData as any).compressionRate || (summaryData.metrics?.compressionRatio ? `${Math.round(summaryData.metrics.compressionRatio * 100)}%` : '78%')}</strong>
                     </span>
                   </div>
                   <span className="text-slate-400">Được tối ưu bởi Phenikaa Gemini AI API</span>
