@@ -181,9 +181,9 @@ export default function App() {
     return matchesCategory && matchesSearch;
   });
 
-  // Separate main featured and sub featured
-  const mainFeatured = posts.find((p) => p.isFeatured) || posts[0];
-  const subFeatured = posts.filter((p) => p.isSubFeatured || (p.id !== mainFeatured.id && !p.isFeatured));
+  // Tiêu điểm hôm nay: Luôn xuất hiện những bài báo đã đăng mới nhất
+  const mainFeatured = posts[0];
+  const subFeatured = posts.slice(1);
   const entertainmentPosts = posts.filter((p) => p.category === 'Giải Trí & Đời Sống');
   const techPosts = posts.filter(
     (p) => p.category === 'Công Nghệ & Đổi Mới' || p.category === 'Tin Phenikaa'
@@ -263,6 +263,37 @@ export default function App() {
       alert('✅ Đã lưu bài viết thành công vào MongoDB!');
     } catch (err: any) {
       alert('Lỗi kết nối khi gửi bài: ' + err.message);
+    }
+  };
+
+  // Handle Edit Post in MongoDB
+  const handleEditPost = async (postId: string, updates: Partial<BlogPost>) => {
+    try {
+      const response = await fetch(`/api/posts/${postId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}),
+        },
+        body: JSON.stringify(updates),
+      });
+
+      const result = await response.json();
+      if (!response.ok || !result.success) {
+        alert(`[Lỗi ${response.status} ${result.code || ''}]: ${result.error || 'Không thể cập nhật bài viết.'}`);
+        return;
+      }
+
+      const updatedPost = result.data;
+      setPosts((prev) =>
+        prev.map((p) => (p.id === postId || (p as any)._id === postId ? { ...p, ...updatedPost } : p))
+      );
+      if (readingPost && (readingPost.id === postId || (readingPost as any)._id === postId)) {
+        setReadingPost((prev) => (prev ? { ...prev, ...updatedPost } : null));
+      }
+      alert('✅ Cập nhật bài viết thành công trên MongoDB!');
+    } catch (err: any) {
+      alert('Lỗi cập nhật bài: ' + err.message);
     }
   };
 
@@ -552,6 +583,7 @@ export default function App() {
         posts={posts}
         onAddPost={handleAddPost}
         onDeletePost={handleDeletePost}
+        onEditPost={handleEditPost}
         onSummarizeText={handleSummarizeTextOnly}
         currentUser={currentUser}
         onOpenAuth={() => setIsAuthOpen(true)}

@@ -43,14 +43,14 @@ export const TopBar: React.FC<TopBarProps> = ({
   const getRoleBadge = (role: string) => {
     if (role === 'admin') {
       return (
-        <span className="bg-amber-500/20 text-amber-300 border border-amber-500/40 px-1.5 py-0.2 rounded text-[10px] font-bold">
-          👑 Admin
+        <span className="bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
+          Admin
         </span>
       );
     }
     return (
-      <span className="bg-blue-500/20 text-blue-300 border border-blue-500/40 px-1.5 py-0.2 rounded text-[10px] font-bold">
-        👤 Người Dùng
+      <span className="bg-blue-500/20 text-blue-300 border border-blue-500/40 px-2 py-0.5 rounded text-[10px] font-bold">
+        Người Dùng
       </span>
     );
   };

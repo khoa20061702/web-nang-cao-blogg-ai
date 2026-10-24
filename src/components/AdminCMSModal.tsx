@@ -26,6 +26,7 @@ interface AdminCMSModalProps {
   posts: BlogPost[];
   onAddPost: (newPost: BlogPost) => void;
   onDeletePost: (postId: string) => void;
+  onEditPost?: (postId: string, updates: Partial<BlogPost>) => void;
   onSummarizeText: (text: string) => Promise<string>;
   currentUser?: UserProfile | null;
   onOpenAuth?: () => void;
@@ -44,11 +45,13 @@ export const AdminCMSModal: React.FC<AdminCMSModalProps> = ({
   posts,
   onAddPost,
   onDeletePost,
+  onEditPost,
   onSummarizeText,
   currentUser,
   onOpenAuth,
 }) => {
   const [activeTab, setActiveTab] = useState<'create' | 'list'>('create');
+  const [editingPostId, setEditingPostId] = useState<string | null>(null);
 
   // Form State
   const [title, setTitle] = useState('');
@@ -86,6 +89,29 @@ export const AdminCMSModal: React.FC<AdminCMSModalProps> = ({
     }
   };
 
+  const handleStartEdit = (post: BlogPost) => {
+    setEditingPostId(post.id || (post as any)._id);
+    setTitle(post.title);
+    setCategory(post.category);
+    setAuthor(post.author);
+    setExcerpt(post.excerpt);
+    setContent(post.content);
+    setCoverImage(post.coverImage);
+    setTagsInput((post.tags || []).join(', '));
+    setPublishMode('now');
+    setActiveTab('create');
+  };
+
+  const handleCancelEdit = () => {
+    setEditingPostId(null);
+    setTitle('');
+    setExcerpt('');
+    setContent('');
+    setAuthor('Ban Biên Tập Phenikaa');
+    setCoverImage(PRESET_COVERS[0].url);
+    setTagsInput('Phenikaa, Sinh Viên, Tin Mới');
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -99,30 +125,43 @@ export const AdminCMSModal: React.FC<AdminCMSModalProps> = ({
       .map((t) => t.trim())
       .filter(Boolean);
 
-    const newPost: BlogPost = {
-      id: `post-${Date.now()}`,
-      title: title.trim(),
-      category,
-      author: author.trim() || 'Biên Tập Viên Phenikaa',
-      authorRole: 'Ban Truyền thông & Báo chí',
-      publishedAt:
-        publishMode === 'now'
-          ? new Date().toLocaleString('vi-VN', { dateStyle: 'short', timeStyle: 'short' })
-          : scheduledDateTime || new Date().toLocaleString('vi-VN', { dateStyle: 'short', timeStyle: 'short' }),
-      readTime: `${Math.max(1, Math.ceil(content.split(/\s+/).length / 200))} phút đọc`,
-      excerpt: excerpt.trim() || content.slice(0, 150) + '...',
-      coverImage: coverImage.trim() || PRESET_COVERS[0].url,
-      content: content.trim(),
-      tags: tags.length > 0 ? tags : ['Phenikaa News'],
-      viewsCount: 1,
-      status: publishMode === 'now' ? 'published' : 'scheduled',
-      scheduledFor: publishMode === 'schedule' ? scheduledDateTime : undefined,
-      reactions: { like: 0, heart: 0, haha: 0, wow: 0, sad: 0 },
-      comments: [],
-    };
-
-    onAddPost(newPost);
-    setSuccessMessage(`Đã xuất bản thành công bài viết: "${title}"!`);
+    if (editingPostId && onEditPost) {
+      // CHẾ ĐỘ SỬA BÀI
+      onEditPost(editingPostId, {
+        title: title.trim(),
+        category,
+        author: author.trim() || 'Biên Tập Viên Phenikaa',
+        excerpt: excerpt.trim() || content.slice(0, 150) + '...',
+        coverImage: coverImage.trim() || PRESET_COVERS[0].url,
+        content: content.trim(),
+        tags: tags.length > 0 ? tags : ['Phenikaa News'],
+        readTime: `${Math.max(1, Math.ceil(content.split(/\s+/).length / 200))} phút đọc`,
+      });
+      setSuccessMessage(`Đã cập nhật bài viết: "${title}"!`);
+      setEditingPostId(null);
+    } else {
+      // CHẾ ĐỘ ĐĂNG BÀI MỚI
+      const newPost: BlogPost = {
+        id: `post-${Date.now()}`,
+        title: title.trim(),
+        category,
+        author: author.trim() || 'Biên Tập Viên Phenikaa',
+        authorRole: 'Ban Truyền thông & Báo chí',
+        publishedAt: new Date().toISOString(),
+        readTime: `${Math.max(1, Math.ceil(content.split(/\s+/).length / 200))} phút đọc`,
+        excerpt: excerpt.trim() || content.slice(0, 150) + '...',
+        coverImage: coverImage.trim() || PRESET_COVERS[0].url,
+        content: content.trim(),
+        tags: tags.length > 0 ? tags : ['Phenikaa News'],
+        viewsCount: 0,
+        status: publishMode === 'now' ? 'published' : 'scheduled',
+        scheduledFor: publishMode === 'schedule' ? scheduledDateTime : undefined,
+        reactions: { like: 0, heart: 0, haha: 0, wow: 0, sad: 0 },
+        comments: [],
+      };
+      onAddPost(newPost);
+      setSuccessMessage(`Đã xuất bản thành công bài viết: "${title}"!`);
+    }
 
     // Reset Form
     setTitle('');
@@ -161,7 +200,7 @@ export const AdminCMSModal: React.FC<AdminCMSModalProps> = ({
                   activeTab === 'create' ? 'bg-[#ff6b00] text-white font-bold' : 'text-slate-300 hover:text-white'
                 }`}
               >
-                Đăng bài mới
+                {editingPostId ? 'Sửa bài viết' : 'Đăng bài mới'}
               </button>
               <button
                 onClick={() => setActiveTab('list')}
@@ -191,7 +230,7 @@ export const AdminCMSModal: React.FC<AdminCMSModalProps> = ({
               <div className="flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
                 <span>
-                  <strong>Chưa đăng nhập:</strong> Bạn đang ở chế độ xem. Vui lòng đăng nhập tài khoản <strong>Admin</strong> hoặc <strong>Editor</strong> để ghi dữ liệu thật vào MongoDB.
+                  <strong>Chưa đăng nhập:</strong> Bạn đang ở chế độ xem. Vui lòng đăng nhập tài khoản <strong>Admin</strong> để quản lý và đăng bài viết vào MongoDB.
                 </span>
               </div>
               {onOpenAuth && (
@@ -204,21 +243,21 @@ export const AdminCMSModal: React.FC<AdminCMSModalProps> = ({
                 </button>
               )}
             </div>
-          ) : currentUser.role === 'student' ? (
-            <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-300 text-rose-800 text-xs flex items-center justify-between gap-3">
+          ) : currentUser.role !== 'admin' ? (
+            <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-xs flex items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <Lock className="w-4 h-4 text-rose-600 shrink-0" />
+                <Lock className="w-4 h-4 text-amber-600 shrink-0" />
                 <span>
-                  <strong>Phân quyền Sinh Viên:</strong> Bạn đang đăng nhập với quyền <code>student</code>. Khi gửi bài viết, server Express sẽ trả về lỗi <code>403 Forbidden</code> (dùng để demo tiêu chí xử lý phân quyền của thầy).
+                  <strong>Tài khoản Người Dùng:</strong> Bạn đang đăng nhập tài khoản <strong>Người Dùng</strong>. Chức năng đăng bài, sửa bài và xóa bài chỉ dành riêng cho tài khoản <strong>Admin</strong>.
                 </span>
               </div>
               {onOpenAuth && (
                 <button
                   type="button"
                   onClick={onOpenAuth}
-                  className="px-3 py-1 bg-[#ff6b00] hover:bg-[#e05e00] text-white font-bold rounded-lg shrink-0 transition-colors shadow-2xs"
+                  className="px-3 py-1 bg-[#003366] hover:bg-[#004080] text-white font-bold rounded-lg shrink-0 transition-colors shadow-2xs"
                 >
-                  Đổi Tài Khoản Admin
+                  Đăng Nhập Admin
                 </button>
               )}
             </div>
@@ -227,7 +266,7 @@ export const AdminCMSModal: React.FC<AdminCMSModalProps> = ({
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                 <span>
-                  Đang đăng nhập với tư cách: <strong>{currentUser.fullName}</strong> ({currentUser.role === 'admin' ? '👑 Quản Trị Viên' : '✍️ Biên Tập Viên'}). Dữ liệu được đồng bộ trực tiếp với MongoDB.
+                  Đang đăng nhập với tư cách: <strong>{currentUser.fullName}</strong> (Quản Trị Viên Admin). Dữ liệu được đồng bộ trực tiếp với MongoDB.
                 </span>
               </div>
             </div>
@@ -243,6 +282,23 @@ export const AdminCMSModal: React.FC<AdminCMSModalProps> = ({
           {/* TAB 1: FORM SOẠN THẢO BÀI VIẾT */}
           {activeTab === 'create' && (
             <form onSubmit={handleSubmit} className="space-y-5">
+              {editingPostId && (
+                <div className="p-3.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-900 text-xs flex items-center justify-between gap-3 animate-fadeIn">
+                  <div className="flex items-center gap-2">
+                    <Edit3 className="w-4 h-4 text-[#00529C] shrink-0" />
+                    <span>
+                      Đang chỉnh sửa bài: <strong>"{title || 'Chưa có tiêu đề'}"</strong>. Nhấn "Lưu Cập Nhật" để ghi nhận thay đổi.
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleCancelEdit}
+                    className="px-3 py-1 bg-white hover:bg-slate-100 text-slate-700 font-semibold border border-slate-300 rounded-lg shrink-0 transition-colors shadow-2xs"
+                  >
+                    Hủy sửa
+                  </button>
+                </div>
+              )}
               {/* Tiêu đề & Chuyên mục */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div className="sm:col-span-2">
@@ -445,7 +501,11 @@ export const AdminCMSModal: React.FC<AdminCMSModalProps> = ({
                 >
                   <Send className="w-4 h-4" />
                   <span>
-                    {publishMode === 'now' ? 'Xuất Bản Bài Viết' : 'Lưu & Đặt Lịch Xuất Bản'}
+                    {editingPostId
+                      ? 'Lưu Cập Nhật Bài Viết'
+                      : publishMode === 'now'
+                      ? 'Xuất Bản Bài Viết'
+                      : 'Lưu & Đặt Lịch Xuất Bản'}
                   </span>
                 </button>
               </div>
@@ -486,8 +546,17 @@ export const AdminCMSModal: React.FC<AdminCMSModalProps> = ({
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex items-center gap-1.5 shrink-0">
                       <button
+                        type="button"
+                        onClick={() => handleStartEdit(post)}
+                        className="p-1.5 rounded-lg text-slate-500 hover:text-[#00529C] hover:bg-blue-50 transition-colors"
+                        title="Sửa bài viết này"
+                      >
+                        <Edit3 className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
                         onClick={() => {
                           if (confirm(`Bạn có chắc muốn xóa bài viết "${post.title}"?`)) {
                             onDeletePost(post.id);

@@ -68,7 +68,7 @@ export const ArticleDetailPage: React.FC<ArticleDetailPageProps> = ({
       id: `comment-${Date.now()}`,
       author: authorName,
       role: currentUser
-        ? (currentUser.role === 'admin' ? 'Ban Quản Trị' : currentUser.role === 'editor' ? 'Biên Tập Viên' : 'Sinh viên Phenikaa')
+        ? (currentUser.role === 'admin' ? 'Ban Quản Trị' : 'Người Dùng')
         : 'Độc giả Phenikaa',
       text: commentText.trim(),
       createdAt: 'Vừa xong',
@@ -483,7 +483,7 @@ export const ArticleDetailPage: React.FC<ArticleDetailPageProps> = ({
                   <div>
                     <p className="font-bold text-sm text-slate-800">{currentUser.fullName}</p>
                     <p className="text-[11px] text-[#00529C] font-semibold">
-                      {currentUser.role === 'admin' ? '🛡 Ban Quản Trị' : currentUser.role === 'editor' ? '✍️ Biên Tập Viên' : '🎓 Sinh viên Phenikaa'}
+                      {currentUser.role === 'admin' ? 'Ban Quản Trị' : 'Người Dùng'}
                     </p>
                   </div>
                 ) : (

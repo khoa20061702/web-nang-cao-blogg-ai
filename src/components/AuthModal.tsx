@@ -193,32 +193,25 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
         <div className="p-5 space-y-4">
           {/* Quick Select Buttons for Demo Presentation */}
-          <div className="p-3 bg-amber-50/80 rounded-xl border border-amber-200 text-xs space-y-2">
-            <div className="flex items-center justify-between text-amber-900 font-bold">
-              <span className="flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-                Tài khoản mẫu báo cáo (Demo Rubric):
-              </span>
-            </div>
+          <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-2">
+            <p className="font-semibold text-slate-600 flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+              Tài khoản demo nhanh:
+            </p>
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => handleQuickFill('admin', 'admin123')}
-                className="px-3 py-2 rounded-xl bg-white border border-amber-300 hover:bg-amber-100/60 text-slate-800 font-semibold text-xs flex flex-col items-center transition-colors shadow-2xs cursor-pointer"
-                title="Quyền Quản Trị Viên: Đăng bài, Xóa bài, Quản trị CMS"
+                className="px-3 py-2 rounded-lg bg-[#003366] text-white font-bold text-xs hover:bg-[#004080] transition-colors cursor-pointer text-center"
               >
-                <span className="text-[#003366] font-bold text-xs">👑 Admin</span>
-                <span className="text-[10px] text-slate-600">Đăng & Quản Trị CMS</span>
+                Admin
               </button>
-
               <button
                 type="button"
                 onClick={() => handleQuickFill('sinhvien', 'sinhvien123')}
-                className="px-3 py-2 rounded-xl bg-white border border-amber-300 hover:bg-amber-100/60 text-slate-800 font-semibold text-xs flex flex-col items-center transition-colors shadow-2xs cursor-pointer"
-                title="Quyền Người Dùng: Đọc báo, Bình luận, Thả cảm xúc"
+                className="px-3 py-2 rounded-lg bg-[#00529C] text-white font-bold text-xs hover:bg-[#003f7a] transition-colors cursor-pointer text-center"
               >
-                <span className="text-[#ff6b00] font-bold text-xs">👤 Người Dùng</span>
-                <span className="text-[10px] text-slate-600">Đọc bài & Bình luận</span>
+                Người Dùng
               </button>
             </div>
           </div>
@@ -355,15 +348,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
               <div>
                 <label className="block text-[11px] font-semibold text-slate-700 mb-1">
-                  Vai trò đăng ký:
+                  Vai trò tài khoản:
                 </label>
-                <select
-                  value={regRole}
-                  onChange={(e) => setRegRole(e.target.value as any)}
-                  className="w-full px-3 py-1.5 text-xs rounded-xl border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-[#00529C]"
-                >
-                  <option value="student">Người Dùng / Độc Giả (Đọc báo, Bình luận, Tương tác)</option>
-                </select>
+                <div className="w-full px-3 py-2 text-xs rounded-xl border border-slate-200 bg-slate-50 text-slate-700 font-medium">
+                  Người Dùng (Đọc báo, Bình luận, Tương tác)
+                </div>
               </div>
 
               <button

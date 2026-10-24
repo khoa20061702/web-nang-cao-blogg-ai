@@ -38,7 +38,7 @@ router.get('/', async (req: Request, res: Response) => {
 
     const [posts, total] = await Promise.all([
       Post.find(filter)
-        .sort({ isFeatured: -1, createdAt: -1 })
+        .sort({ createdAt: -1, _id: -1 })
         .skip(skip)
         .limit(pageSize)
         .lean(),
@@ -107,12 +107,12 @@ router.get('/:id', async (req: Request, res: Response) => {
 
 /**
  * POST /api/posts
- * Requires authentication and role 'admin' or 'editor'
+ * Requires authentication and role 'admin'
  */
 router.post(
   '/',
   authenticate,
-  requireRole('admin', 'editor'),
+  requireRole('admin'),
   async (req: AuthenticatedRequest, res: Response) => {
     try {
       const {
@@ -169,6 +169,74 @@ router.post(
       return res.status(500).json({
         success: false,
         error: 'Lỗi máy chủ khi tạo bài viết: ' + error.message,
+        code: 'SERVER_ERROR',
+      });
+    }
+  }
+);
+
+/**
+ * PUT /api/posts/:id
+ * Requires authentication and role 'admin'
+ */
+router.put(
+  '/:id',
+  authenticate,
+  requireRole('admin'),
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const { id } = req.params;
+      const {
+        title,
+        category,
+        author,
+        authorRole,
+        excerpt,
+        content,
+        coverImage,
+        tags,
+        isFeatured,
+        isSubFeatured,
+      } = req.body;
+
+      const updateData: any = {};
+      if (title !== undefined) updateData.title = title.trim();
+      if (category !== undefined) updateData.category = category;
+      if (author !== undefined) updateData.author = author.trim();
+      if (authorRole !== undefined) updateData.authorRole = authorRole.trim();
+      if (excerpt !== undefined) updateData.excerpt = excerpt.trim();
+      if (content !== undefined) {
+        updateData.content = content.trim();
+        updateData.readTime = `${Math.max(1, Math.ceil(content.split(/\s+/).length / 200))} phút đọc`;
+      }
+      if (coverImage !== undefined) updateData.coverImage = coverImage;
+      if (tags !== undefined) updateData.tags = Array.isArray(tags) ? tags : [];
+      if (isFeatured !== undefined) updateData.isFeatured = Boolean(isFeatured);
+      if (isSubFeatured !== undefined) updateData.isSubFeatured = Boolean(isSubFeatured);
+
+      const updated = await Post.findByIdAndUpdate(id, updateData, { new: true }).lean();
+
+      if (!updated) {
+        return res.status(404).json({
+          success: false,
+          error: 'Bài viết không tồn tại hoặc đã bị xóa.',
+          code: 'POST_NOT_FOUND',
+        });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: 'Cập nhật bài viết thành công.',
+        data: {
+          ...updated,
+          id: (updated as any)._id.toString(),
+        },
+      });
+    } catch (error: any) {
+      console.error('Update post error:', error);
+      return res.status(500).json({
+        success: false,
+        error: 'Lỗi máy chủ khi cập nhật bài viết: ' + error.message,
         code: 'SERVER_ERROR',
       });
     }
