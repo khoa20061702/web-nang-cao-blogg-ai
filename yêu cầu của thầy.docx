@@ -1,0 +1,233 @@
+1. Tổng quan
+Mỗi nhóm báo cáo project trong 14 phút: 10 phút trình bày và demo, 4 phút hỏi đáp. Mục tiêu là đánh giá
+cả sản phẩm của nhóm lẫn hiểu biết và đóng góp của từng thành viên.
+Yêu cầu tối thiểu của project
+• Frontend React (function component, Hooks), gọi API thật.
+• Backend Node.js/Express (hoặc FastAPI cho phần AI) với REST API, xác thực và cơ sở dữ liệu.
+• Có kiểm thử tự động và được deploy lên Internet.
+• Điểm cộng: microservices/message queue, Docker Compose, CI, hoặc tích hợp mô hình AI (phân
+loại, phát hiện đối tượng, tìm kiếm ảnh, chatbot RAG), Blockchain.
+Các mốc
+Mốc Thời điểm Nội dung
+Đăng ký đề tài 20/10 Tên nhóm, thành viên, đề tài, link
+repo
+Nộp sản phẩm Trước buổi báo cáo 1 ngày,
+23:59
+Toàn bộ mục ở phần 2
+Báo cáo Buổi cuối kỳ Theo thứ tự bốc thăm
+Đánh giá chéo Trong 24 giờ sau buổi báo
+cáo
+Phiếu ở phần 6, nộp cá nhân
+Giảng viên sẽ thông báo ngày cụ thể cho từng mốc trên hệ thống học tập.
+2. Sản phẩm cần nộp
+Nộp đủ 5 mục dưới đây trước hạn. Thiếu mục nào thì tiêu chí tương ứng trong rubric bị chấm 0.
+Mục Yêu cầu
+Repo GitHub README có hướng dẫn chạy bằng một lệnh (docker
+compose up hoặc npm install && npm run dev); có
+.env.example, không commit secret; mỗi thành viên
+commit bằng tài khoản của mình; gắn tag final tại commit
+nộp
+Link deploy Chạy được tại thời điểm báo cáo (Vercel, Render,
+Railway, Hugging Face Spaces, Streamlit Cloud…); kèm
+tài khoản demo nếu có đăng nhập
+Mục Yêu cầu
+Báo cáo PDF (5–8 trang) Bài toán và người dùng; sơ đồ kiến trúc; danh sách API
+chính; mô hình dữ liệu; kiểm thử; đánh giá mô hình AI
+(nếu có); hạn chế
+Bảng phân công Ai làm phần nào, % đóng góp tự đánh giá (tổng 100%),
+có xác nhận của tất cả thành viên
+Video demo dự phòng (3–5 phút) Quay luồng chính, dùng khi demo trực tiếp gặp sự cố
+mạng hoặc server
+Nếu dùng công cụ AI khi viết code hoặc báo cáo, ghi rõ trong báo cáo: dùng công cụ nào, cho phần nào
+(xem phần 4).
+3. Cấu trúc bài trình bày (15 phút)
+Mọi thành viên đều phải trình bày ít nhất một phần. Hết 15 phút, giảng viên dừng phần trình bày để
+chuyển sang hỏi đáp.
+Phần Thời gian Yêu cầu
+Bài toán và người dùng 1 phút Vấn đề cần giải quyết, người dùng mục tiêu, các
+chức năng chính
+Kiến trúc 2 phút Sơ đồ frontend → API → CSDL / service / mô hình
+AI; giải thích lý do chọn công nghệ và cách tổ chức
+Demo trực tiếp 2 phút Chạy luồng chính từ đầu đến cuối trên bản deploy;
+minh hoạ ít nhất một trường hợp lỗi (dữ liệu sai,
+chưa đăng nhập, không đủ quyền)
+Kỹ thuật nổi bật 2 phút Một hoặc hai vấn đề khó nhất và cách nhóm giải
+quyết, có trích đoạn code
+Chất lượng 2 phút Kết quả test/CI, biện pháp bảo mật (auth, validate,
+quản lý secret), số liệu hiệu năng hoặc chỉ số mô
+hình AI
+Hạn chế và hướng phát triển 1 phút Những gì chưa làm được và sẽ làm gì nếu có thêm
+thời gian
+Lưu ý khi làm slide
+• Tối đa khoảng 12 slide; mỗi slide một ý chính, ít chữ.
+• Sơ đồ kiến trúc do nhóm tự vẽ, khớp với code thực tế.
+• Code trình chiếu phải đọc được từ cuối phòng (cỡ chữ từ 18pt).
+4. Hỏi đáp cá nhân và quy định dùng AI
+Giảng viên chỉ định người trả lời; thành viên khác không trả lời thay. Mỗi sinh viên nhận ít nhất một câu,
+chủ yếu về phần mình đã khai trong bảng phân công  
+Các dạng câu hỏi
+1. Giải thích một đoạn code do giảng viên chọn ngẫu nhiên trong repo.
+2. Giải thích một quyết định thiết kế, ví dụ vì sao lưu token ở cookie, vì sao tách service, vì sao chọn
+MongoDB.
+3. Tình huống mở rộng, ví dụ số người dùng tăng 10 lần thì nút thắt ở đâu, service A sập thì chuyện
+gì xảy ra.
+4. Sửa nhỏ tại chỗ trong tối đa 3 phút: thêm một trường, một validation, hoặc một test.
+Quy định dùng công cụ AI (ChatGPT, Claude, Copilot…)
+• Được phép dùng để học, gợi ý code, tìm lỗi.
+• Phải khai báo trong báo cáo: công cụ nào, dùng cho phần nào.
+• Sinh viên chịu trách nhiệm với mọi dòng code mình nộp. Không giải thích được phần do mình
+phụ trách thì điểm hỏi đáp cá nhân ở mức Yếu.
+• Sao chép project của nhóm khác hoặc từ Internet mà không ghi nguồn bị xử lý theo quy chế học
+vụ.
+5. Rubric chấm điểm (100 điểm)
+Mỗi tiêu chí có bốn mức. Điểm trong ngoặc là khoảng điểm của mức đó.
+Tiêu chí
+(điểm)
+Tốt Khá Đạt Yếu
+Chức
+năng và
+demo
+(25)
+(22–25) Đủ chức năng đã
+đăng ký, demo trên bản
+deploy trơn tru, xử lý tốt
+trường hợp lỗi
+(17–21) Luồng
+chính chạy tốt,
+thiếu vài chức
+năng phụ
+(12–16) Chạy được
+nhưng có lỗi khi
+demo, phải dùng
+video dự phòng
+(0–11) Không
+chạy hoặc
+thiếu phần lớn
+chức năng
+Kiến trúc
+và chất
+lượng
+code (20)
+(18–20) Tách lớp rõ, REST
+đúng chuẩn, xử lý lỗi tập
+trung, state React hợp lý
+(14–17) Cấu trúc
+ổn, còn vài chỗ
+lặp code hoặc
+thiếu xử lý lỗi
+(10–13) Chạy được
+nhưng code dồn
+một chỗ, khó đọc
+(0–9) Không
+có cấu trúc,
+nhiều lỗi rõ
+ràng
+Kiểm
+thử, CI
+và bảo
+mật (15)
+(13–15) Có unit và integration
+test, CI chạy xanh; băm mật
+khẩu, validate input, kiểm tra
+quyền, không lộ secret
+(10–12) Có test
+cho phần chính,
+bảo mật cơ bản
+đủ
+(7–9) Ít test, thiếu
+một biện pháp bảo
+mật quan trọng
+(0–6) Không
+có test hoặc lộ
+secret trong
+repo
+Deploy
+và tài liệu
+(10)
+(9–10) Deploy ổn định,
+README chạy được ngay,
+báo cáo đầy đủ và khớp code
+(7–8) Deploy
+được, tài liệu
+thiếu vài phần
+(5–6) Deploy chập
+chờn hoặc
+README thiếu
+bước
+(0–4) Không
+deploy hoặc
+không có tài
+liệu
+Trình bày
+(10)
+(9–10) Rõ ràng, đúng giờ, mọi
+thành viên cùng tham gia, sơ
+đồ dễ hiểu
+(7–8) Khá rõ, hơi
+lệch thời gian
+(5–6) Lan man
+hoặc một người
+trình bày gần hết
+(0–4) Thiếu
+chuẩn bị
+Tiêu chí
+(điểm)
+Tốt Khá Đạt Yếu
+Hỏi đáp
+cá nhân
+(20)
+(18–20) Trả lời đúng, giải
+thích được lý do, sửa code tại
+chỗ thành công
+(14–17) Trả lời
+đúng phần lớn,
+cần gợi ý nhỏ
+(10–13) Hiểu một
+phần, giải thích
+chung chung
+(0–9) Không
+giải thích được
+phần mình phụ
+trách
+Cách tính điểm cá nhân
+• Điểm nhóm = tổng 5 tiêu chí đầu (tối đa 80).
+• Điểm cá nhân = Điểm nhóm × hệ số đóng góp + Điểm hỏi đáp cá nhân (tối đa 20). Tổng tối đa
+100, quy ra thang 10.
+• Hệ số đóng góp từ 0,5 đến 1,0. Giảng viên xác định hệ số dựa trên bảng phân công, lịch sử
+commit và phiếu đánh giá chéo. Mặc định là 1,0 nếu đóng góp đồng đều.
+• Điểm cộng tối đa 10 (không vượt 100 tổng) cho microservices/message queue, Docker Compose
+đầy đủ, hoặc tích hợp mô hình AI có số liệu đánh giá.
+6. Phiếu đánh giá chéo thành viên
+Mỗi sinh viên nộp riêng, ẩn danh với nhóm, trong 24 giờ sau buổi báo cáo. Chấm từng thành viên khác
+(không chấm bản thân) theo thang 1–5: 1 = rất kém, 3 = đạt yêu cầu, 5 = xuất sắc.
+Họ tên người đánh giá: ……………… · Nhóm: …………
+Tiêu chí Thành viên
+1: ……
+Thành viên
+2: ……
+Thành viên
+3: ……
+Thành viên
+4: ……
+Hoàn thành phần việc được giao
+Đúng hạn, tham gia họp nhóm
+Chất lượng code / sản phẩm
+Hỗ trợ thành viên khác
+% đóng góp ước tính
+Nhận xét thêm (không bắt buộc): …………………………………………
+Giảng viên chỉ dùng phiếu để điều chỉnh hệ số khi các nguồn (phiếu, commit, hỏi đáp) cùng cho thấy
+chênh lệch rõ rệt; một phiếu đơn lẻ không đủ để hạ điểm ai.
+7. Quy định chung và checklist
+Quy định
+• Thứ tự báo cáo bốc thăm đầu buổi; nhóm phải có mặt từ đầu buổi.
+• Sinh viên vắng không có lý do nhận 0 điểm phần hỏi đáp cá nhân; vắng có lý do sẽ được hỏi đáp
+bù.
+• Nhóm tự chuẩn bị laptop, dây HDMI/adapter và dữ liệu mẫu
+Checklist trước khi báo cáo
+• ☐ Clone repo sạch về một máy khác và chạy theo README thành công
+• ☐ Link deploy mở được, tài khoản demo đăng nhập được
+• ☐ Dữ liệu mẫu đã seed sẵn cho demo
+• ☐ Video demo dự phòng đã tải về máy, mở được không cần mạng
+• ☐ Slide đã tập thử, tổng thời gian dưới 15 phút
+• ☐ Mỗi thành viên đã đọc lại phần code mình phụ trách và giải thích được
+• ☐ Báo cáo PDF và bảng phân công đã nộp đủ chữ ký xác nhận

@@ -3,25 +3,39 @@ import { User } from '../models/User.ts';
 import { Post } from '../models/Post.ts';
 import { INITIAL_POSTS } from '../../src/data/mockPosts.ts';
 
-const MONGODB_URI =
-  process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/phenikaa_news';
+let cachedPromise: Promise<boolean> | null = null;
 
 export async function connectDB(): Promise<boolean> {
-  try {
-    mongoose.set('strictQuery', false);
-    await mongoose.connect(MONGODB_URI, {
-      serverSelectionTimeoutMS: 5000,
-    });
-    console.log(`[MongoDB] ✅ Kết nối thành công tới database: ${mongoose.connection.name}`);
+  const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/phenikaa_news';
 
-    // Tự động seed dữ liệu mẫu ban đầu nếu database trống
-    await seedInitialData();
+  // Nếu đã kết nối sẵn trong instance serverless, tái sử dụng ngay
+  if (mongoose.connection.readyState === 1) {
     return true;
-  } catch (error: any) {
-    console.warn(`[MongoDB Warning] ⚠️ Không thể kết nối tới MongoDB (${MONGODB_URI}): ${error.message}`);
-    console.warn(`[MongoDB Notice] Bạn có thể chạy 'docker compose up -d mongo' hoặc cấu hình MONGODB_URI trong .env.`);
-    return false;
   }
+
+  if (cachedPromise) {
+    return cachedPromise;
+  }
+
+  cachedPromise = (async () => {
+    try {
+      mongoose.set('strictQuery', false);
+      await mongoose.connect(uri, {
+        serverSelectionTimeoutMS: 5000,
+      });
+      console.log(`[MongoDB] ✅ Kết nối thành công tới database: ${mongoose.connection.name}`);
+
+      // Tự động seed dữ liệu mẫu ban đầu nếu database trống
+      await seedInitialData();
+      return true;
+    } catch (error: any) {
+      console.error(`[MongoDB Error] ⚠️ Không thể kết nối tới MongoDB: ${error.message}`);
+      cachedPromise = null;
+      return false;
+    }
+  })();
+
+  return cachedPromise;
 }
 
 async function seedInitialData() {
