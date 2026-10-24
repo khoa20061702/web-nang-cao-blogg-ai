@@ -458,100 +458,151 @@ export const ArticleDetailPage: React.FC<ArticleDetailPageProps> = ({
 
         {/* KHU VỰC BÌNH LUẬN & THẢO LUẬN */}
         <section className="bg-white rounded-2xl border border-slate-200 p-6 sm:p-8 shadow-xs space-y-6">
+          {/* Header */}
           <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2.5">
               <MessageCircle className="w-5 h-5 text-[#ff6b00]" />
               <h3 className="font-serif font-black text-lg text-[#003366]">
-                Ý Kiến Bạn Đọc ({post.comments ? post.comments.length : 0})
+                Thảo Luận ({post.comments ? post.comments.length : 0})
               </h3>
             </div>
-            <span className="text-xs text-slate-400">Văn minh • Tôn trọng • Xây dựng</span>
+            <span className="text-[11px] text-slate-400 hidden sm:block">Văn minh • Tôn trọng • Xây dựng</span>
           </div>
 
           {/* Form gửi bình luận */}
-          <form onSubmit={handleSendComment} className="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
-            <div className="flex items-center justify-between text-xs text-slate-600">
-              {currentUser ? (
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-[#00529C]">Đang bình luận dưới tên:</span>
-                  <span className="px-2 py-0.5 rounded bg-blue-100 text-[#00529C] font-semibold">
-                    {currentUser.fullName} ({currentUser.role})
-                  </span>
-                </div>
-              ) : (
-                <div className="flex items-center gap-2 w-full sm:w-auto">
-                  <input
-                    type="text"
-                    value={commentName}
-                    onChange={(e) => setCommentName(e.target.value)}
-                    placeholder="Tên của bạn (hoặc sinh viên)..."
-                    className="px-3 py-1.5 rounded-lg border border-slate-300 text-xs w-full sm:w-64 focus:outline-[#00529C]"
-                  />
-                  <button
-                    type="button"
-                    onClick={onOpenAuth}
-                    className="text-[#00529C] hover:underline font-semibold text-xs whitespace-nowrap cursor-pointer"
-                  >
-                    Đăng nhập để hiển thị avatar
-                  </button>
-                </div>
-              )}
+          <form onSubmit={handleSendComment} className="space-y-4 bg-gradient-to-br from-slate-50 to-blue-50/30 p-5 rounded-2xl border border-slate-200">
+            {/* Thông tin người gửi */}
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-[#003366] text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm">
+                {currentUser
+                  ? currentUser.fullName.charAt(0).toUpperCase()
+                  : (commentName.trim() ? commentName.charAt(0).toUpperCase() : '?')}
+              </div>
+              <div className="flex-1 min-w-0">
+                {currentUser ? (
+                  <div>
+                    <p className="font-bold text-sm text-slate-800">{currentUser.fullName}</p>
+                    <p className="text-[11px] text-[#00529C] font-semibold">
+                      {currentUser.role === 'admin' ? '🛡 Ban Quản Trị' : currentUser.role === 'editor' ? '✍️ Biên Tập Viên' : '🎓 Sinh viên Phenikaa'}
+                    </p>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={commentName}
+                      onChange={(e) => setCommentName(e.target.value)}
+                      placeholder="Nhập tên của bạn..."
+                      className="flex-1 px-3 py-2 rounded-xl border border-slate-300 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#00529C]/30 focus:border-[#00529C] transition-all"
+                    />
+                    <button
+                      type="button"
+                      onClick={onOpenAuth}
+                      className="shrink-0 px-3 py-2 rounded-xl bg-[#00529C] text-white text-xs font-bold hover:bg-[#003f7a] transition-colors cursor-pointer"
+                    >
+                      Đăng nhập
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
 
+            {/* Ô nhập nội dung */}
             <textarea
               value={commentText}
               onChange={(e) => setCommentText(e.target.value)}
-              placeholder="Chia sẻ quan điểm của bạn về bài viết này..."
-              rows={3}
-              className="w-full p-3 rounded-xl border border-slate-300 text-xs sm:text-sm focus:outline-[#00529C] bg-white resize-none"
+              placeholder="Chia sẻ ý kiến của bạn về bài viết này..."
+              rows={4}
+              className="w-full px-4 py-3 rounded-xl border border-slate-300 text-sm text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-[#00529C]/30 focus:border-[#00529C] resize-none leading-relaxed placeholder:text-slate-400 transition-all"
             />
 
-            <div className="flex justify-end">
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] text-slate-400">{commentText.length}/500 ký tự</span>
               <button
                 type="submit"
                 disabled={!commentText.trim()}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-[#003366] hover:bg-[#004080] text-white shadow-sm transition-all disabled:opacity-40 cursor-pointer"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold bg-[#003366] hover:bg-[#004080] text-white shadow-sm transition-all disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
               >
-                <Send className="w-3.5 h-3.5" />
+                <Send className="w-4 h-4" />
                 <span>Gửi bình luận</span>
               </button>
             </div>
           </form>
 
           {/* Danh sách bình luận */}
-          <div className="space-y-4 pt-2">
+          <div className="space-y-3">
             {post.comments && post.comments.length > 0 ? (
-              post.comments.map((comment) => (
-                <div
-                  key={comment.id}
-                  className="p-4 rounded-xl bg-slate-50/80 border border-slate-200 space-y-1.5 transition-colors hover:bg-slate-50"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full bg-[#003366] text-white flex items-center justify-center font-bold text-[10px]">
-                        {comment.author ? comment.author.charAt(0).toUpperCase() : 'U'}
-                      </div>
-                      <span className="font-bold text-xs text-slate-800">{comment.author}</span>
-                      {comment.role && (
-                        <span className="text-[10px] px-1.5 py-0.2 rounded bg-slate-200 text-slate-600 font-medium">
-                          {comment.role}
-                        </span>
-                      )}
+              post.comments.map((comment, idx) => {
+                // Hỗ trợ cả 2 dạng field:
+                // - MongoDB API trả về: userName, userRole, content
+                // - Dữ liệu cũ/local: author, role, text
+                const displayName = (comment as any).userName || comment.author || 'Độc giả Phenikaa';
+                const displayRole = (comment as any).userRole || comment.role || '';
+                const displayText = (comment as any).content || comment.text || '';
+                const rawDate = comment.createdAt || '';
+
+                // Format thời gian thật từ ISO date
+                let displayTime = 'Vừa xong';
+                if (rawDate && rawDate !== 'Vừa xong') {
+                  try {
+                    const d = new Date(rawDate);
+                    const now = new Date();
+                    const diffMs = now.getTime() - d.getTime();
+                    const diffMins = Math.floor(diffMs / 60000);
+                    const diffHours = Math.floor(diffMins / 60);
+                    const diffDays = Math.floor(diffHours / 24);
+                    if (diffMins < 1) displayTime = 'Vừa xong';
+                    else if (diffMins < 60) displayTime = `${diffMins} phút trước`;
+                    else if (diffHours < 24) displayTime = `${diffHours} giờ trước`;
+                    else if (diffDays < 7) displayTime = `${diffDays} ngày trước`;
+                    else displayTime = d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                  } catch {
+                    displayTime = rawDate;
+                  }
+                }
+
+                const avatarColors = ['#003366', '#00529C', '#d97706', '#059669', '#7c3aed', '#dc2626'];
+                const avatarBg = avatarColors[idx % avatarColors.length];
+
+                return (
+                  <div
+                    key={comment.id || idx}
+                    className="flex gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-slate-200 hover:bg-white transition-all"
+                  >
+                    {/* Avatar chữ cái */}
+                    <div
+                      className="w-10 h-10 rounded-full text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm"
+                      style={{ backgroundColor: avatarBg }}
+                    >
+                      {displayName.charAt(0).toUpperCase()}
                     </div>
-                    <span className="text-[11px] text-slate-400 font-mono">{comment.createdAt}</span>
+
+                    {/* Nội dung bình luận */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center flex-wrap gap-2 mb-1.5">
+                        <span className="font-bold text-sm text-slate-800">{displayName}</span>
+                        {displayRole && (
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-blue-100 text-[#00529C] font-semibold">
+                            {displayRole}
+                          </span>
+                        )}
+                        <span className="text-[11px] text-slate-400 ml-auto font-mono shrink-0">{displayTime}</span>
+                      </div>
+                      <p className="text-sm text-slate-700 leading-relaxed">{displayText}</p>
+                    </div>
                   </div>
-                  <p className="text-xs sm:text-sm text-slate-700 pl-8 leading-relaxed">
-                    {comment.text}
-                  </p>
-                </div>
-              ))
+                );
+              })
             ) : (
-              <p className="text-xs text-slate-400 text-center py-4">
-                Chưa có bình luận nào. Hãy là người đầu tiên để lại ý kiến!
-              </p>
+              <div className="text-center py-10">
+                <MessageCircle className="w-10 h-10 text-slate-200 mx-auto mb-3" />
+                <p className="text-sm text-slate-400 font-medium">Chưa có bình luận nào.</p>
+                <p className="text-xs text-slate-300 mt-1">Hãy là người đầu tiên để lại ý kiến!</p>
+              </div>
             )}
           </div>
         </section>
+
 
         {/* BÀI VIẾT LIÊN QUAN / CÙNG CHUYÊN MỤC */}
         {relatedPosts && relatedPosts.length > 0 && (
