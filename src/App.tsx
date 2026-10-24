@@ -16,10 +16,7 @@ import { AdminCMSModal } from './components/AdminCMSModal.tsx';
 import { ArticleDetailPage } from './components/ArticleDetailPage.tsx';
 import { Footer } from './components/Footer.tsx';
 import { AuthModal, UserProfile } from './components/AuthModal.tsx';
-import {
-  INITIAL_POSTS,
-  TRENDING_POSTS,
-} from './data/mockPosts.ts';
+import { INITIAL_POSTS } from './data/mockPosts.ts';
 import {
   BlogPost,
   CategoryType,
@@ -158,7 +155,22 @@ export default function App() {
     });
   }, [posts]);
 
-  // Filter posts based on category and search query
+  // ĐỌC NHIỀU NHẤT: tự động tính từ viewsCount thật, sắp xếp giảm dần
+  const trendingList = React.useMemo(() => {
+    const published = posts.filter((p) => !p.status || p.status === 'published');
+    return [...published]
+      .sort((a, b) => (b.viewsCount ?? 0) - (a.viewsCount ?? 0))
+      .slice(0, 5)
+      .map((p, i) => ({
+        rank: String(i + 1).padStart(2, '0'),
+        id: p.id,
+        title: p.title,
+        category: p.category,
+        views: ((p.viewsCount ?? 0) >= 1000
+          ? `${((p.viewsCount ?? 0) / 1000).toFixed(1)}k`
+          : String(p.viewsCount ?? 0)) + ' lượt đọc',
+      }));
+  }, [posts]);
   const filteredPosts = posts.filter((post) => {
     const matchesCategory = activeCategory === 'all' || post.category === activeCategory;
     const matchesSearch =
@@ -248,17 +260,6 @@ export default function App() {
 
       const createdPost = result.data;
       setPosts((prev) => [createdPost, ...prev]);
-
-      const now = new Date();
-      const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-      const newTimelineItem: TimelineNewsItem = {
-        id: `tl-${Date.now()}`,
-        time: timeStr,
-        title: createdPost.title,
-        category: createdPost.category,
-        badge: 'MỚI ĐĂNG',
-      };
-      setTimelineNews((prev) => [newTimelineItem, ...prev]);
       alert('✅ Đã lưu bài viết thành công vào MongoDB!');
     } catch (err: any) {
       alert('Lỗi kết nối khi gửi bài: ' + err.message);
@@ -368,8 +369,22 @@ export default function App() {
   };
 
   const handleOpenPost = (post: BlogPost) => {
-    setReadingPost(post);
     const targetId = post.id || (post as any)._id;
+    // Tăng lượt đọc thật trên MongoDB và cập nhật local state
+    fetch(`/api/posts/${targetId}`)
+      .then((r) => r.json())
+      .then((result) => {
+        if (result.success && result.data) {
+          const updated = { ...result.data, id: targetId };
+          setPosts((prev) =>
+            prev.map((p) => (p.id === targetId || (p as any)._id === targetId ? updated : p))
+          );
+          setReadingPost(updated);
+        }
+      })
+      .catch(() => {/* fallback: vẫn hiển thị bài bình thường */});
+
+    setReadingPost(post);
     if (window.location.pathname !== `/post/${targetId}`) {
       window.history.pushState(null, '', `/post/${targetId}`);
     }
@@ -513,9 +528,9 @@ export default function App() {
             <div className="lg:col-span-4">
               <Sidebar247
                 timelineNews={timelineNews}
-                trendingList={TRENDING_POSTS}
+                trendingList={trendingList}
                 onSelectPostById={(id) => {
-                  const found = posts.find((p) => p.id === id);
+                  const found = posts.find((p) => p.id === id || (p as any)._id === id);
                   if (found) handleOpenPost(found);
                 }}
               />

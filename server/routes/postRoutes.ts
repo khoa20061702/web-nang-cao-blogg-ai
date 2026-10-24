@@ -142,7 +142,7 @@ router.post(
         author: author?.trim() || req.user?.fullName || 'Biên Tập Viên Phenikaa',
         authorRole: authorRole?.trim() || (req.user?.role === 'admin' ? 'Quản Trị Viên' : 'Biên Tập Viên'),
         authorId: req.user?.id,
-        publishedAt: 'Vừa xong',
+        publishedAt: new Date().toISOString(),
         readTime: `${Math.max(1, Math.ceil(content.split(/\s+/).length / 200))} phút đọc`,
         excerpt: excerpt?.trim() || content.slice(0, 150) + '...',
         coverImage: coverImage || 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80',
@@ -153,7 +153,7 @@ router.post(
         status: 'published',
         reactions: { like: 0, heart: 0, haha: 0, wow: 0, sad: 0 },
         comments: [],
-        viewsCount: 1,
+        viewsCount: 0,
       });
 
       return res.status(201).json({
