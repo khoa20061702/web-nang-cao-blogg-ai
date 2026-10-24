@@ -18,7 +18,6 @@ import { Footer } from './components/Footer.tsx';
 import { AuthModal, UserProfile } from './components/AuthModal.tsx';
 import {
   INITIAL_POSTS,
-  TIMELINE_NEWS,
   TRENDING_POSTS,
 } from './data/mockPosts.ts';
 import {
@@ -128,8 +127,36 @@ export default function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, [posts]);
 
-  // Timeline
-  const [timelineNews, setTimelineNews] = useState<TimelineNewsItem[]>(TIMELINE_NEWS);
+  // Timeline: tự động generate từ posts thật, mới nhất lên trước
+  const timelineNews: TimelineNewsItem[] = React.useMemo(() => {
+    const published = posts.filter((p) => !p.status || p.status === 'published');
+    const sorted = [...published].sort(
+      (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+    );
+    return sorted.slice(0, 10).map((p) => {
+      const date = new Date(p.publishedAt);
+      const now = new Date();
+      const diffMs = now.getTime() - date.getTime();
+      const diffMins = Math.floor(diffMs / 60000);
+      const diffHours = Math.floor(diffMins / 60);
+      const diffDays = Math.floor(diffHours / 24);
+
+      let timeLabel: string;
+      if (diffMins < 1) timeLabel = 'Vừa xong';
+      else if (diffMins < 60) timeLabel = `${diffMins} phút trước`;
+      else if (diffHours < 24) timeLabel = `${diffHours} giờ trước`;
+      else if (diffDays < 7) timeLabel = `${diffDays} ngày trước`;
+      else timeLabel = date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+
+      return {
+        id: p.id,
+        time: timeLabel,
+        title: p.title,
+        category: p.category,
+        badge: diffDays < 1 ? 'MỚI' : undefined,
+      };
+    });
+  }, [posts]);
 
   // Filter posts based on category and search query
   const filteredPosts = posts.filter((post) => {
